@@ -19,12 +19,12 @@
                     borderWidth: 2, fill: type === "line", tension: .35, borderRadius: type === "bar" ? 6 : 0, pointRadius: 3
                 }]
             },
-            options: {
+            options: { animation: {duration: 500},
                 responsive: true, maintainAspectRatio: false,
                 plugins: {legend: {display: type === "pie" || type === "doughnut", position: "right"},
                     tooltip: {callbacks: {label: c => " " + fmt(c.parsed.y !== undefined ? c.parsed.y : c.parsed)}}},
                 scales: type === "pie" || type === "doughnut" ? {} : {
-                    y: {beginAtZero: true, ticks: {callback: v => isMoney ? (v >= 1e6 ? (v / 1e6) + "tr" : (v / 1e3) + "k") : v}},
+                    y: {beginAtZero: true, ticks: {precision: 0, callback: v => isMoney ? (v >= 1e6 ? (v / 1e6) + "tr" : (v / 1e3) + "k") : v}},
                     x: {grid: {display: false}}
                 }
             }
