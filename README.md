@@ -36,7 +36,7 @@ src/main/resources/templates   # layouts, fragments, auth, home, product, user, 
 ## Hướng dẫn cài đặt và chạy
 
 ### 1. Yêu cầu
-- JDK 21+, Maven 3.9+ (hoặc mở bằng IntelliJ IDEA)
+- JDK 21+ (Maven không bắt buộc vì đã có Maven Wrapper `mvnw`)
 - MySQL 8.x
 
 ### 2. Tạo database
@@ -61,9 +61,12 @@ Nếu dùng tài khoản MySQL khác, sửa `spring.datasource.*` trong `src/mai
 | `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET` | Mã website VNPay sandbox (đăng ký tại sandbox.vnpayment.vn/devreg) | Ẩn lựa chọn VNPay, chỉ dùng COD |
 
 ### 4. Chạy
+Không cần cài Maven, dùng Maven Wrapper có sẵn trong project:
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run        # macOS / Linux
+mvnw.cmd spring-boot:run      # Windows
 ```
+Hoặc mở thư mục `rebook` bằng IntelliJ IDEA rồi chạy `RebookApplication`.
 Mở http://localhost:8080
 
 ### 5. Tài khoản demo (mật khẩu chung: `123456a`)
