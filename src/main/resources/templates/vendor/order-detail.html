@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title th:text="'Đơn #' + ${order.code}">Đơn hàng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Xử lý đơn hàng</h1>
+<div layout:fragment="content">
+    <a th:href="@{/vendor/orders}" class="small"><i class="bi bi-arrow-left"></i> Danh sách đơn</a>
+    <div class="rb-card p-3 mt-2 d-flex flex-wrap gap-2 align-items-center">
+        <strong class="me-2">Thao tác:</strong>
+        <form th:if="${order.status.name() == 'NEW'}" th:action="@{/vendor/orders/{id}/status(id=${order.id})}" method="post">
+            <input type="hidden" name="status" value="CONFIRMED">
+            <button class="btn btn-sm btn-primary"><i class="bi bi-check2"></i> Xác nhận đơn</button>
+        </form>
+        <form th:if="${order.status.name() == 'NEW' or order.status.name() == 'CONFIRMED'}" th:action="@{/vendor/orders/{id}/status(id=${order.id})}"
+              method="post" data-confirm="Hủy đơn hàng này? Sách sẽ được hoàn về kho.">
+            <input type="hidden" name="status" value="CANCELLED">
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Hủy đơn</button>
+        </form>
+        <form th:if="${order.status.name() == 'CONFIRMED'}" th:action="@{/vendor/orders/{id}/shipper(id=${order.id})}" method="post" class="d-flex gap-2">
+            <select name="shipperId" class="form-select form-select-sm" required>
+                <option value="">-- Chọn shipper giao hàng --</option>
+                <option th:each="s : ${shippers}" th:value="${s.id}" th:text="${s.fullName} + ' - ' + ${s.phone}"
+                        th:selected="${order.shipper != null and order.shipper.id == s.id}"></option>
+            </select>
+            <button class="btn btn-sm btn-outline-primary text-nowrap"><i class="bi bi-truck"></i> Giao cho shipper</button>
+        </form>
+        <span class="small text-muted" th:if="${order.status.name() != 'NEW' and order.status.name() != 'CONFIRMED'}">
+            Đơn đang ở trạng thái "<span th:text="${order.status.label}"></span>", shipper sẽ cập nhật các bước giao hàng tiếp theo.
+        </span>
+        <a th:href="@{/vendor/chat(customer=${order.user.id})}" class="btn btn-sm btn-light border ms-auto"><i class="bi bi-chat-dots"></i> Chat với khách</a>
+    </div>
+    <div th:replace="~{fragments/order-view :: view(${order}, 'vendor')}"></div>
+</div>
+</body>
+</html>

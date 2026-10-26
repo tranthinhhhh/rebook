@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Mã khuyến mãi</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif" th:text="${form.id == null} ? 'Tạo mã khuyến mãi' : 'Sửa mã khuyến mãi'"></h1>
+<div layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+            <div class="rb-card p-4">
+                <form th:action="@{__${action}__}" th:object="${form}" method="post" novalidate>
+                    <input type="hidden" th:field="*{id}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Mã *</label>
+                            <input class="form-control text-uppercase" th:field="*{code}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{code}"></div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Tên chương trình *</label>
+                            <input class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{name}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Loại giảm giá</label>
+                            <select class="form-select" th:field="*{type}">
+                                <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Mức giảm (%)</label>
+                            <input type="number" class="form-control" th:field="*{percent}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{percent}"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Giảm tối đa (đ)</label>
+                            <input type="number" class="form-control" th:field="*{maxDiscount}" step="1000">
+                            <small class="text-muted">0 = không giới hạn</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Đơn tối thiểu (đ)</label>
+                            <input type="number" class="form-control" th:field="*{minOrder}" step="1000">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Bắt đầu</label>
+                            <input type="datetime-local" class="form-control" th:field="*{startAt}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{startAt}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Kết thúc</label>
+                            <input type="datetime-local" class="form-control" th:field="*{endAt}" th:classappend="${#fields.hasErrors('endAt') or #fields.hasErrors('validRange')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{endAt}"></div>
+                            <div class="invalid-feedback" th:errors="*{validRange}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Số lượt sử dụng</label>
+                            <input type="number" class="form-control" th:field="*{quantity}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{quantity}"></div>
+                        </div>
+                        <div class="col-md-8 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" th:field="*{active}" id="active">
+                                <label class="form-check-label" for="active">Kích hoạt</label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex gap-2">
+                            <button class="btn btn-primary px-4">Lưu</button>
+                            <a th:href="@{__${backUrl}__}" class="btn btn-light border">Hủy</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

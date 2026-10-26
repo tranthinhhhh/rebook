@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Doanh thu</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Quản lý doanh thu</h1>
+<div layout:fragment="content">
+    <div class="row g-3 mb-3">
+        <div class="col-md-4"><div class="rb-card rb-stat"><div class="icon bg-primary-soft text-primary"><i class="bi bi-wallet2"></i></div>
+            <div><div class="value" th:text="${@fmt.money(summary.totalRevenue)}"></div><div class="label">Tổng doanh thu thực nhận</div></div></div></div>
+        <div class="col-md-4"><div class="rb-card rb-stat"><div class="icon" style="background:#fdf3e1;color:#b7862c"><i class="bi bi-percent"></i></div>
+            <div><div class="value" th:text="${@fmt.money(summary.commission)}"></div><div class="label" th:text="'Chiết khấu app (' + ${summary.commissionRate} + '%)'"></div></div></div></div>
+        <div class="col-md-4"><div class="rb-card rb-stat"><div class="icon" style="background:#e4f2e6;color:#3d6b3a"><i class="bi bi-bag-check"></i></div>
+            <div><div class="value" th:text="${summary.deliveredOrders}"></div><div class="label">Đơn giao thành công</div></div></div></div>
+    </div>
+    <div class="rb-card p-3 mb-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <h2 class="h6 fw-bold mb-0">Biểu đồ doanh thu</h2>
+            <div class="btn-group btn-group-sm">
+                <a th:each="p : ${ {'day','month','year'} }" th:href="@{/vendor/revenue(period=${p})}" class="btn btn-outline-primary"
+                   th:classappend="${period == p} ? 'active'" th:text="${p == 'day'} ? '30 ngày' : (${p == 'month'} ? '12 tháng' : '5 năm')"></a>
+            </div>
+        </div>
+        <div style="height:320px"><canvas id="revChart"></canvas></div>
+        <p class="small text-muted mt-2 mb-0">Doanh thu thực nhận = tiền sách − giảm giá của shop − chiết khấu app, tính trên đơn đã giao.</p>
+    </div>
+    <div class="rb-card">
+        <h2 class="h6 fw-bold p-3 mb-0">Top sách bán chạy</h2>
+        <table class="table mb-0 small">
+            <thead><tr><th>#</th><th>Tên sách</th><th class="text-end">Số lượng</th><th class="text-end">Doanh số</th></tr></thead>
+            <tbody><tr th:each="t, st : ${topProducts}"><td th:text="${st.count}"></td><td th:text="${t[0]}"></td>
+                <td class="text-end" th:text="${t[1]}"></td><td class="text-end" th:text="${@fmt.money(t[2])}"></td></tr></tbody>
+        </table>
+    </div>
+</div>
+<th:block layout:fragment="scripts">
+    <th:block th:replace="~{fragments/chart :: render('revChart', ${chart}, ${period == 'day'} ? 'line' : 'bar', 'Doanh thu', true)}"></th:block>
+</th:block>
+</body>
+</html>

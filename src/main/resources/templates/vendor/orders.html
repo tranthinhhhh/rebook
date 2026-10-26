@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Đơn hàng của shop</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Đơn hàng</h1>
+<div layout:fragment="content">
+    <div class="rb-card mb-3 overflow-auto">
+        <ul class="nav nav-underline px-3 flex-nowrap">
+            <li class="nav-item"><a class="nav-link text-nowrap" th:classappend="${status == null} ? 'active'" th:href="@{/vendor/orders}">Tất cả</a></li>
+            <li class="nav-item" th:each="s : ${statuses}">
+                <a class="nav-link text-nowrap" th:classappend="${status == s} ? 'active'" th:href="@{/vendor/orders(status=${s})}">
+                    <span th:text="${s.label}"></span> <span class="badge rounded-pill bg-primary-soft text-primary" th:text="${counts.get(s)}"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <form class="d-flex gap-2 mb-3" method="get">
+        <input type="hidden" name="status" th:value="${status}">
+        <input type="search" name="q" class="form-control form-control-sm" style="max-width:300px" placeholder="Mã đơn hoặc tên người nhận" th:value="${q}">
+        <button class="btn btn-sm btn-outline-primary">Tìm</button>
+    </form>
+    <div class="rb-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead><tr><th>Mã đơn</th><th>Ngày đặt</th><th>Người nhận</th><th>Số sách</th><th class="text-end">Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="o : ${page.content}">
+                    <td class="fw-semibold" th:text="'#' + ${o.code}"></td>
+                    <td th:text="${@fmt.dateTime(o.createdAt)}"></td>
+                    <td><div th:text="${o.receiverName}"></div><small class="text-muted" th:text="${o.receiverPhone}"></small></td>
+                    <td th:text="${#lists.size(o.items)}"></td>
+                    <td class="text-end fw-semibold" th:text="${@fmt.money(o.total)}"></td>
+                    <td><span th:text="${o.paymentMethod.name()}"></span><br><small class="text-muted" th:text="${o.paymentStatus.label}"></small></td>
+                    <td><span class="badge" th:classappend="'text-bg-' + ${o.status.color}" th:text="${o.status.label}"></span></td>
+                    <td><a th:href="@{/vendor/orders/{id}(id=${o.id})}" class="btn btn-sm btn-outline-primary">Xử lý</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="rb-empty" th:if="${page.totalElements == 0}"><i class="bi bi-receipt"></i><p>Không có đơn hàng</p></div>
+    </div>
+    <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+</div>
+</body>
+</html>

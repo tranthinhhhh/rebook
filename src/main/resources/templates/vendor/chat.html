@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Chat với khách</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Chat với khách hàng</h1>
+<div layout:fragment="content">
+    <div th:replace="~{fragments/chat :: box('vendor', ${store.id}, ${customer != null} ? ${customer.id} : null, ${customer != null} ? ${customer.fullName} : '')}"></div>
+</div>
+</body>
+</html>

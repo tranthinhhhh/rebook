@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Mở cửa hàng</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="rb-card p-4" th:if="${store != null}">
+                <div class="text-center">
+                    <div class="display-5 mb-2" th:classappend="${store.status.name() == 'BLOCKED'} ? 'text-danger' : 'text-warning'">
+                        <i class="bi" th:classappend="${store.status.name() == 'BLOCKED'} ? 'bi-slash-circle' : 'bi-hourglass-split'"></i>
+                    </div>
+                    <h1 class="h4" th:text="${store.name}"></h1>
+                    <p class="mb-1">Trạng thái: <span class="badge text-bg-warning" th:text="${store.status.label}"></span></p>
+                    <p class="text-muted" th:if="${store.status.name() == 'PENDING'}">Quản trị viên sẽ xem xét và duyệt cửa hàng của bạn sớm. Bạn sẽ nhận được thông báo ngay khi được duyệt.</p>
+                    <p class="text-muted" th:if="${store.status.name() == 'ACTIVE'}">Cửa hàng đã được duyệt. <a th:href="@{/vendor}">Vào Kênh người bán</a></p>
+                    <p class="text-muted" th:if="${store.status.name() == 'BLOCKED'}">Cửa hàng đã bị khóa. Vui lòng liên hệ hotro@rebook.vn.</p>
+                </div>
+            </div>
+            <div class="rb-card p-4" th:if="${store == null}">
+                <h1 class="h4">Mở cửa hàng sách cũ trên ReBook</h1>
+                <p class="text-muted">Đăng ký miễn phí. Sau khi được duyệt, bạn có thể đăng bán sách, quản lý đơn hàng và theo dõi doanh thu. ReBook thu chiết khấu mặc định 5% trên mỗi đơn giao thành công.</p>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <form th:action="@{/vendor/register}" th:object="${form}" method="post" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Tên cửa hàng</label>
+                        <input class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{name}"></div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Địa chỉ cửa hàng</label>
+                            <input class="form-control" th:field="*{address}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{address}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Số điện thoại</label>
+                            <input class="form-control" th:field="*{phone}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{phone}"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giới thiệu cửa hàng</label>
+                        <textarea class="form-control" rows="4" th:field="*{description}"></textarea>
+                    </div>
+                    <button class="btn btn-primary px-4" type="submit">Gửi đăng ký</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

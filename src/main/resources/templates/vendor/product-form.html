@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Thông tin sách</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif" th:text="${form.id == null} ? 'Thêm sách mới' : 'Sửa thông tin sách'"></h1>
+<div layout:fragment="content">
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-danger" th:if="${product != null and product.status.name() == 'BANNED'}">Sách này đã bị quản trị viên cấm bán.</div>
+    <form th:action="@{/vendor/products/save}" th:object="${form}" method="post" enctype="multipart/form-data" novalidate>
+        <input type="hidden" th:field="*{id}">
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <div class="rb-card p-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Tên sách *</label>
+                            <input class="form-control" th:field="*{title}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{title}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tác giả *</label>
+                            <input class="form-control" th:field="*{author}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{author}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nhà xuất bản</label>
+                            <input class="form-control" th:field="*{publisher}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Năm xuất bản</label>
+                            <input type="number" class="form-control" th:field="*{publishYear}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{publishYear}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Số trang</label>
+                            <input type="number" class="form-control" th:field="*{pages}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{pages}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ISBN</label>
+                            <input class="form-control" th:field="*{isbn}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Danh mục *</label>
+                            <select class="form-select" th:field="*{categoryId}" th:errorclass="is-invalid">
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{categoryId}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tình trạng sách *</label>
+                            <select class="form-select" th:field="*{bookCondition}" th:errorclass="is-invalid">
+                                <option value="">-- Chọn tình trạng --</option>
+                                <option th:each="c : ${conditions}" th:value="${c}" th:text="${c.label}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{bookCondition}"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" rows="6" th:field="*{description}" placeholder="Nội dung sách, tình trạng chi tiết (ố vàng, ghi chú, gáy...)"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rb-card p-4 mb-3">
+                    <h2 class="h6 fw-bold">Giá & kho</h2>
+                    <div class="mb-3">
+                        <label class="form-label small">Giá bán (đ) *</label>
+                        <input type="number" class="form-control" th:field="*{price}" step="1000" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{price}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Giá bìa gốc (đ)</label>
+                        <input type="number" class="form-control" th:field="*{originalPrice}" step="1000" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{originalPrice}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Khuyến mãi riêng (%)</label>
+                        <input type="number" class="form-control" th:field="*{discountPercent}" min="0" max="90" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{discountPercent}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Số lượng trong kho *</label>
+                        <input type="number" class="form-control" th:field="*{stock}" min="0" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{stock}"></div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="hidden" name="status" value="HIDDEN" th:checked="*{status != null and status.name() == 'HIDDEN'}">
+                        <label class="form-check-label small" for="hidden">Ẩn sách (chưa bán)</label>
+                    </div>
+                </div>
+                <div class="rb-card p-4 mb-3">
+                    <h2 class="h6 fw-bold">Hình ảnh</h2>
+                    <div class="mb-3" th:if="${product != null}" style="max-width:120px">
+                        <th:block th:replace="~{fragments/cover :: cover(${product}, '')}"></th:block>
+                    </div>
+                    <label class="form-label small">Ảnh bìa</label>
+                    <input type="file" name="cover" class="form-control form-control-sm mb-3" accept="image/*">
+                    <label class="form-label small">Ảnh phụ (tối đa 6)</label>
+                    <input type="file" name="gallery" class="form-control form-control-sm" accept="image/*" multiple>
+                    <div class="d-flex flex-wrap gap-2 mt-3" th:if="${product != null}">
+                        <div th:each="img : ${product.images}" class="position-relative">
+                            <img th:src="${img.url}" style="width:64px;height:84px;object-fit:cover" class="rounded border" alt="">
+                            <button type="submit" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 px-1" style="font-size:10px"
+                                    th:formaction="@{/vendor/products/{pid}/images/{iid}/delete(pid=${product.id}, iid=${img.id})}" formnovalidate>✕</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary flex-grow-1" type="submit">Lưu sách</button>
+                    <a th:href="@{/vendor/products}" class="btn btn-light border">Hủy</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

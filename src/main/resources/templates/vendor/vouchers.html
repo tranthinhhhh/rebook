@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Khuyến mãi</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Chương trình khuyến mãi</h1>
+<div layout:fragment="content">
+    <div class="d-flex mb-3">
+        <p class="text-muted small mb-0">Mã giảm giá của shop chỉ áp dụng cho sách của cửa hàng bạn. Để giảm giá từng đầu sách, sửa "Khuyến mãi riêng (%)" trong thông tin sách.</p>
+        <a th:href="${#strings.startsWith(currentUri, '/admin')} ? @{/admin/vouchers/new} : @{/vendor/vouchers/new}" class="btn btn-sm btn-primary ms-auto text-nowrap"><i class="bi bi-plus-lg"></i> Tạo mã mới</a>
+    </div>
+    <div th:replace="~{fragments/voucher-table :: table(${vouchers}, ${#strings.startsWith(currentUri, '/admin')} ? '/admin/vouchers' : '/vendor/vouchers')}"></div>
+</div>
+</body>
+</html>

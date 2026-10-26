@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Trang chủ shop</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Trang chủ shop</h1>
+<div layout:fragment="content">
+    <div class="rb-card overflow-hidden mb-3">
+        <div class="rb-store-banner rounded-0" th:style="${store.bannerUrl} ? 'background-image:url(' + ${store.bannerUrl} + ')' : ''"></div>
+        <div class="p-3 d-flex align-items-center gap-3 flex-wrap">
+            <img th:if="${store.logoUrl}" th:src="${store.logoUrl}" class="rb-store-logo" alt="">
+            <span th:unless="${store.logoUrl}" class="rb-store-logo"><i class="bi bi-shop"></i></span>
+            <div class="flex-grow-1">
+                <div class="fw-semibold" th:text="${store.name}"></div>
+                <small class="text-muted">Trạng thái: <span th:text="${store.status.label}"></span> · Chiết khấu app: <span th:text="${store.commissionRate} + '%'"></span></small>
+            </div>
+            <a th:href="@{/stores/{id}(id=${store.id})}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-up-right"></i> Xem như khách</a>
+        </div>
+    </div>
+    <div class="rb-card p-4">
+        <form th:action="@{/vendor/store}" th:object="${form}" method="post" enctype="multipart/form-data" novalidate>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Tên cửa hàng</label>
+                    <input class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:errors="*{name}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại</label>
+                    <input class="form-control" th:field="*{phone}" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:errors="*{phone}"></div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Địa chỉ</label>
+                    <input class="form-control" th:field="*{address}" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:errors="*{address}"></div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Giới thiệu</label>
+                    <textarea class="form-control" rows="4" th:field="*{description}"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Logo</label>
+                    <input type="file" name="logo" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ảnh bìa (banner)</label>
+                    <input type="file" name="banner" class="form-control" accept="image/*">
+                </div>
+                <div class="col-12"><button class="btn btn-primary px-4">Lưu thay đổi</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

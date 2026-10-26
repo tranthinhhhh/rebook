@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Kênh người bán</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif" th:text="${store.name}"></h1>
+<div layout:fragment="content">
+    <div class="alert alert-danger" th:if="${store.status.name() == 'BLOCKED'}"><i class="bi bi-slash-circle"></i> Cửa hàng đang bị khóa, sách của bạn không hiển thị với khách hàng.</div>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3"><div class="rb-card rb-stat"><div class="icon bg-primary-soft text-primary"><i class="bi bi-cash-stack"></i></div>
+            <div><div class="value" th:text="${@fmt.money(summary.monthRevenue)}"></div><div class="label">Doanh thu tháng này</div></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="rb-card rb-stat"><div class="icon" style="background:#fdf3e1;color:#b7862c"><i class="bi bi-wallet2"></i></div>
+            <div><div class="value" th:text="${@fmt.money(summary.totalRevenue)}"></div><div class="label">Tổng doanh thu thực nhận</div></div></div></div>
+        <div class="col-sm-6 col-xl-3"><a th:href="@{/vendor/orders(status='NEW')}" class="rb-card rb-stat text-dark"><div class="icon" style="background:#e3eefc;color:#2f6fd0"><i class="bi bi-receipt"></i></div>
+            <div><div class="value" th:text="${summary.newOrders}"></div><div class="label">Đơn mới cần xác nhận</div></div></a></div>
+        <div class="col-sm-6 col-xl-3"><a th:href="@{/vendor/products}" class="rb-card rb-stat text-dark"><div class="icon" style="background:#e4f2e6;color:#3d6b3a"><i class="bi bi-journal-bookmark"></i></div>
+            <div><div class="value" th:text="${summary.products}"></div><div class="label">Đầu sách đang quản lý</div></div></a></div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+            <div class="rb-card p-3 h-100">
+                <div class="d-flex justify-content-between mb-2"><h2 class="h6 fw-bold mb-0">Doanh thu 30 ngày gần nhất</h2><a th:href="@{/vendor/revenue}" class="small">Chi tiết</a></div>
+                <div style="height:280px"><canvas id="revChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="rb-card p-3 h-100">
+                <h2 class="h6 fw-bold">Đơn hàng theo trạng thái</h2>
+                <a th:each="e : ${counts}" th:href="@{/vendor/orders(status=${e.key})}" class="d-flex justify-content-between py-2 border-bottom text-dark small">
+                    <span><span class="badge me-2" th:classappend="'text-bg-' + ${e.key.color}">&nbsp;</span><span th:text="${e.key.label}"></span></span>
+                    <strong th:text="${e.value}"></strong>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="rb-card">
+                <div class="p-3 d-flex justify-content-between"><h2 class="h6 fw-bold mb-0">Đơn hàng gần đây</h2><a th:href="@{/vendor/orders}" class="small">Xem tất cả</a></div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle small">
+                        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
+                        <tbody>
+                        <tr th:each="o : ${recentOrders}">
+                            <td><a th:href="@{/vendor/orders/{id}(id=${o.id})}" th:text="'#' + ${o.code}"></a></td>
+                            <td th:text="${o.receiverName}"></td>
+                            <td th:text="${@fmt.money(o.total)}"></td>
+                            <td><span class="badge" th:classappend="'text-bg-' + ${o.status.color}" th:text="${o.status.label}"></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="rb-card p-3">
+                <h2 class="h6 fw-bold">Sách bán chạy của shop</h2>
+                <div th:each="t, st : ${topProducts}" class="d-flex align-items-center gap-2 py-2 border-bottom small">
+                    <span class="badge bg-primary-soft text-primary" th:text="${st.count}"></span>
+                    <span class="flex-grow-1 text-truncate" th:text="${t[0]}"></span>
+                    <span class="text-muted text-nowrap" th:text="${t[1]} + ' cuốn'"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="scripts">
+    <th:block th:replace="~{fragments/chart :: render('revChart', ${chart}, 'line', 'Doanh thu', true)}"></th:block>
+</th:block>
+</body>
+</html>
