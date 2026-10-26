@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Thông báo</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row g-4">
+        <div class="col-lg-3"><div th:replace="~{fragments/user-nav :: nav}"></div></div>
+        <div class="col-lg-9">
+            <div class="rb-card">
+                <h1 class="h5 p-3 mb-0 border-bottom">Thông báo</h1>
+                <a th:each="n : ${notifications}" th:href="${n.link ?: '#'}" class="d-flex gap-3 p-3 border-bottom text-dark"
+                   th:classappend="${!n.readFlag} ? 'bg-primary-soft'">
+                    <i class="bi bi-bell text-primary fs-5"></i>
+                    <div><div th:text="${n.message}"></div><small class="text-muted" th:text="${@fmt.dateTime(n.createdAt)}"></small></div>
+                </a>
+                <div class="rb-empty" th:if="${#lists.isEmpty(notifications)}"><i class="bi bi-bell-slash"></i><p>Chưa có thông báo</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

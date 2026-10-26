@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="avatar(url, name, cls)">
+    <img th:if="${url != null and !#strings.isEmpty(url)}" th:src="${url}" class="rb-avatar" th:classappend="${cls}" alt="">
+    <span th:unless="${url != null and !#strings.isEmpty(url)}" class="rb-avatar" th:classappend="${cls}"
+          th:text="${#strings.toUpperCase(#strings.substring(name, 0, 1))}"></span>
+</th:block>
+</html>

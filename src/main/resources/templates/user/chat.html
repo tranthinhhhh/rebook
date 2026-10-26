@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Tin nhắn</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row g-4">
+        <div class="col-lg-3"><div th:replace="~{fragments/user-nav :: nav}"></div></div>
+        <div class="col-lg-9">
+            <h1 class="h4 rb-section-title mb-3">Chat với cửa hàng</h1>
+            <div th:replace="~{fragments/chat :: box('user', ${activeStore != null} ? ${activeStore.id} : null, ${currentUser.id}, ${activeStore != null} ? ${activeStore.name} : '')}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

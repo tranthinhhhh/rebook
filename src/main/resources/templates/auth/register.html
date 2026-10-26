@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Đăng ký</title></head>
+<body>
+<div layout:fragment="content" class="container rb-auth">
+    <div class="row justify-content-center w-100 mx-0">
+        <div class="col-md-8 col-lg-6">
+            <div class="rb-card shadow-sm">
+                <h1 class="h3 text-center mb-1">Tạo tài khoản</h1>
+                <p class="text-center text-muted mb-4">Mã OTP kích hoạt sẽ được gửi tới email của bạn</p>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <form th:action="@{/auth/register}" th:object="${form}" method="post" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Họ và tên</label>
+                        <input type="text" class="form-control" th:field="*{fullName}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{email}"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" th:field="*{phone}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{phone}"></div>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid">
+                            <div class="invalid-feedback" th:errors="*{password}"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Nhập lại mật khẩu</label>
+                            <input type="password" class="form-control" th:field="*{confirmPassword}"
+                                   th:classappend="${#fields.hasErrors('passwordMatched')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{passwordMatched}"></div>
+                        </div>
+                    </div>
+                    <p class="small text-muted">Mật khẩu tối thiểu 6 ký tự, gồm cả chữ và số. Mật khẩu được mã hóa BCrypt trước khi lưu.</p>
+                    <button class="btn btn-primary w-100 py-2" type="submit">Đăng ký và nhận mã OTP</button>
+                </form>
+                <p class="text-center mt-4 mb-0">Đã có tài khoản? <a th:href="@{/auth/login}" class="fw-semibold">Đăng nhập</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

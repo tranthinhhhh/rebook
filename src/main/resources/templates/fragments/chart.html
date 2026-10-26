@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Vẽ biểu đồ Chart.js từ ChartData (labels, values) -->
+<th:block th:fragment="render(canvasId, chart, type, label, money)">
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        const id = /*[[${canvasId}]]*/ "c", labels = /*[[${chart.labels}]]*/ [], values = /*[[${chart.values}]]*/ [];
+        const isMoney = /*[[${money}]]*/ false, type = /*[[${type}]]*/ "bar", label = /*[[${label}]]*/ "";
+        const palette = ["#8c4a2f", "#d9a441", "#2f5d62", "#5b4a8c", "#c0392b", "#3d6b3a", "#7a6c2f", "#34495e", "#a05a2c", "#6b3a5d", "#2f4a8c", "#8c2f4f"];
+        const fmt = v => isMoney ? new Intl.NumberFormat("vi-VN").format(v) + " ₫" : v;
+        new Chart(document.getElementById(id), {
+            type,
+            data: {
+                labels,
+                datasets: [{
+                    label, data: values,
+                    backgroundColor: type === "line" ? "rgba(140,74,47,.12)" : (type === "bar" ? "#8c4a2f" : palette),
+                    borderColor: type === "line" ? "#8c4a2f" : (type === "bar" ? "#8c4a2f" : "#fff"),
+                    borderWidth: 2, fill: type === "line", tension: .35, borderRadius: type === "bar" ? 6 : 0, pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {legend: {display: type === "pie" || type === "doughnut", position: "right"},
+                    tooltip: {callbacks: {label: c => " " + fmt(c.parsed.y !== undefined ? c.parsed.y : c.parsed)}}},
+                scales: type === "pie" || type === "doughnut" ? {} : {
+                    y: {beginAtZero: true, ticks: {callback: v => isMoney ? (v >= 1e6 ? (v / 1e6) + "tr" : (v / 1e3) + "k") : v}},
+                    x: {grid: {display: false}}
+                }
+            }
+        });
+    });
+</script>
+</th:block>
+</html>

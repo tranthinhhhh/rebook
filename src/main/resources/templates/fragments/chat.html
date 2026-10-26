@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--
+  Khung chat realtime dùng chung.
+  mode = 'user'   : danh sách hội thoại theo cửa hàng
+  mode = 'vendor' : danh sách hội thoại theo khách hàng
+-->
+<div th:fragment="box(mode, storeId, customerId, title)" class="rb-card overflow-hidden">
+    <div class="row g-0">
+        <div class="col-md-4 border-end rb-chat-list" style="max-height:520px">
+            <div class="p-3 border-bottom fw-semibold">Hội thoại</div>
+            <a th:each="c : ${conversations}" class="item"
+               th:href="${mode == 'user'} ? @{/user/chat(store=${c.storeId})} : @{/vendor/chat(customer=${c.customerId})}"
+               th:classappend="${(mode == 'user' and c.storeId == storeId) or (mode == 'vendor' and c.customerId == customerId)} ? 'active'">
+                <div class="fw-semibold small" th:text="${mode == 'user'} ? ${c.storeName} : ${c.customerName}"></div>
+                <div class="small text-muted text-truncate" th:text="${c.content}"></div>
+            </a>
+            <div class="p-3 small text-muted" th:if="${#lists.isEmpty(conversations)}">Chưa có cuộc trò chuyện nào</div>
+        </div>
+        <div class="col-md-8 rb-chat">
+            <th:block th:if="${storeId != null and customerId != null}">
+                <div class="p-3 border-bottom fw-semibold d-flex align-items-center gap-2">
+                    <i class="bi bi-chat-dots text-primary"></i> <span th:text="${title}"></span>
+                    <span class="badge bg-success-subtle text-success ms-auto small js-ws-status">Realtime</span>
+                </div>
+                <div class="rb-chat-body" id="chatBody" th:attr="data-store=${storeId},data-customer=${customerId},data-me=${currentUser.id}">
+                    <div th:each="m : ${messages}" class="rb-msg" th:classappend="${m.senderId == currentUser.id} ? 'mine'">
+                        <div class="bubble" th:text="${m.content}"></div>
+                        <div class="time" th:text="${m.createdAt}"></div>
+                    </div>
+                </div>
+                <form class="p-2 border-top d-flex gap-2" id="chatForm" autocomplete="off">
+                    <input type="text" class="form-control" id="chatInput" maxlength="1000" placeholder="Nhập tin nhắn..." required>
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i></button>
+                </form>
+            </th:block>
+            <div th:unless="${storeId != null and customerId != null}" class="rb-empty my-auto">
+                <i class="bi bi-chat-square-text"></i>
+                <p class="mt-2">Chọn một cuộc trò chuyện để bắt đầu</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const body = document.getElementById("chatBody");
+            if (!body) return;
+            const storeId = Number(body.dataset.store), customerId = Number(body.dataset.customer), me = Number(body.dataset.me);
+            const scroll = () => body.scrollTop = body.scrollHeight;
+            function append(m) {
+                const wrap = document.createElement("div");
+                wrap.className = "rb-msg" + (m.senderId === me ? " mine" : "");
+                const bubble = document.createElement("div");
+                bubble.className = "bubble";
+                bubble.textContent = m.content;
+                const time = document.createElement("div");
+                time.className = "time";
+                time.textContent = m.createdAt;
+                wrap.append(bubble, time);
+                body.appendChild(wrap);
+                scroll();
+            }
+            document.addEventListener("DOMContentLoaded", () => {
+                scroll();
+                RB.onChat(m => { if (m.storeId === storeId && m.customerId === customerId) append(m); });
+                document.getElementById("chatForm").addEventListener("submit", e => {
+                    e.preventDefault();
+                    const input = document.getElementById("chatInput");
+                    const text = input.value.trim();
+                    if (text && RB.sendChat(storeId, customerId, text)) input.value = "";
+                });
+            });
+        })();
+    </script>
+</div>
+</html>

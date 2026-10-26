@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Hệ thống cửa hàng</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <h1 class="h3 rb-section-title mb-4">Hệ thống cửa hàng ReBook</h1>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        <div class="col" th:each="s : ${stores}">
+            <a class="rb-card d-block h-100 text-dark overflow-hidden" th:href="@{/stores/{id}(id=${s.id})}">
+                <div class="rb-store-banner rounded-0" style="height:110px" th:style="${s.bannerUrl} ? 'height:110px;background-image:url(' + ${s.bannerUrl} + ')' : 'height:110px'"></div>
+                <div class="rb-store-card">
+                    <img th:if="${s.logoUrl}" th:src="${s.logoUrl}" class="rb-store-logo" alt="">
+                    <span th:unless="${s.logoUrl}" class="rb-store-logo"><i class="bi bi-shop"></i></span>
+                    <div class="min-w-0">
+                        <div class="fw-semibold" th:text="${s.name}"></div>
+                        <small class="text-muted d-block"><i class="bi bi-geo-alt"></i> <span th:text="${s.address}"></span></small>
+                        <small class="text-muted"><i class="bi bi-telephone"></i> <span th:text="${s.phone}"></span></small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

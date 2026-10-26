@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <title layout:title-pattern="$CONTENT_TITLE | ReBook">ReBook</title>
+</head>
+<body th:attr="data-logged-in=${currentUser != null} ? 'true' : null">
+<div class="rb-topbar py-1 d-none d-md-block">
+    <div class="container d-flex justify-content-between">
+        <span><i class="bi bi-telephone"></i> Hotline 1900 6868 · Chuỗi cửa hàng sách cũ ReBook</span>
+        <span class="d-flex gap-3">
+            <a th:href="@{/stores}"><i class="bi bi-shop"></i> Hệ thống cửa hàng</a>
+            <a sec:authorize="hasRole('VENDOR')" th:href="@{/vendor}"><i class="bi bi-speedometer2"></i> Kênh người bán</a>
+            <a sec:authorize="hasRole('USER') or isAnonymous()" th:href="@{/vendor/register}"><i class="bi bi-plus-circle"></i> Mở cửa hàng</a>
+            <a sec:authorize="hasAnyRole('ADMIN','MANAGER')" th:href="@{/admin}"><i class="bi bi-gear"></i> Trang quản trị</a>
+            <a sec:authorize="hasRole('SHIPPER')" th:href="@{/shipper}"><i class="bi bi-truck"></i> Kênh giao hàng</a>
+        </span>
+    </div>
+</div>
+
+<header class="rb-header">
+    <div class="container py-2">
+        <div class="d-flex align-items-center gap-3 flex-wrap flex-lg-nowrap">
+            <a class="navbar-brand me-lg-3" th:href="@{/}"><i class="bi bi-book-half"></i> ReBook</a>
+            <form class="rb-search input-group order-3 order-lg-2 flex-grow-1" th:action="@{/search}" method="get" role="search">
+                <input class="form-control" type="search" name="q" th:value="${param.q}" placeholder="Tìm tên sách, tác giả, nhà xuất bản, ISBN..." aria-label="Tìm kiếm">
+                <button class="btn btn-primary px-3" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+            <div class="d-flex align-items-center gap-1 ms-auto order-2 order-lg-3">
+                <th:block th:if="${currentUser != null}">
+                    <div class="dropdown">
+                        <a href="#" class="rb-icon-btn" data-bs-toggle="dropdown" aria-label="Thông báo">
+                            <i class="bi bi-bell"></i>
+                            <span class="badge rounded-pill bg-danger js-notify-badge" th:classappend="${unreadCount == null or unreadCount == 0} ? 'd-none'" th:text="${unreadCount}"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-notify p-0 shadow">
+                            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                <strong>Thông báo</strong>
+                                <a th:href="@{/user/notifications}" class="small">Xem tất cả</a>
+                            </div>
+                            <a th:each="n : ${latestNotifications}" class="dropdown-item py-2 border-bottom" th:href="${n.link ?: '#'}"
+                               th:classappend="${!n.readFlag} ? 'bg-primary-soft'">
+                                <div th:text="${n.message}"></div>
+                                <small class="text-muted" th:text="${@fmt.dateTime(n.createdAt)}"></small>
+                            </a>
+                            <div th:if="${#lists.isEmpty(latestNotifications)}" class="text-muted small p-3 text-center">Chưa có thông báo</div>
+                        </div>
+                    </div>
+                    <a th:href="@{/user/chat}" class="rb-icon-btn" aria-label="Tin nhắn"><i class="bi bi-chat-dots"></i></a>
+                </th:block>
+                <a th:href="@{/cart}" class="rb-icon-btn" aria-label="Giỏ hàng">
+                    <i class="bi bi-bag"></i>
+                    <span class="badge rounded-pill bg-danger js-cart-badge" th:classappend="${cartCount == null or cartCount == 0} ? 'd-none'" th:text="${cartCount}"></span>
+                </a>
+                <div class="dropdown ms-1" th:if="${currentUser != null}">
+                    <a href="#" class="d-flex align-items-center gap-2 text-dark" data-bs-toggle="dropdown">
+                        <th:block th:replace="~{fragments/avatar :: avatar(${currentUser.avatarUrl}, ${currentUser.fullName}, '')}"></th:block>
+                        <span class="d-none d-xl-inline small fw-semibold text-nowrap" th:text="${currentUser.fullName}"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li class="px-3 py-2 small text-muted">
+                            <div class="fw-semibold text-dark" th:text="${currentUser.fullName}"></div>
+                            <span th:text="${currentUser.role.label}"></span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="bi bi-person me-2"></i>Tài khoản của tôi</a></li>
+                        <li><a class="dropdown-item" th:href="@{/user/orders}"><i class="bi bi-receipt me-2"></i>Đơn mua</a></li>
+                        <li><a class="dropdown-item" th:href="@{/user/favorites}"><i class="bi bi-heart me-2"></i>Sách yêu thích</a></li>
+                        <li><a class="dropdown-item" th:href="@{/user/viewed}"><i class="bi bi-clock-history me-2"></i>Sách đã xem</a></li>
+                        <li sec:authorize="hasRole('VENDOR')"><a class="dropdown-item" th:href="@{/vendor}"><i class="bi bi-shop me-2"></i>Kênh người bán</a></li>
+                        <li sec:authorize="hasAnyRole('ADMIN','MANAGER')"><a class="dropdown-item" th:href="@{/admin}"><i class="bi bi-gear me-2"></i>Trang quản trị</a></li>
+                        <li sec:authorize="hasRole('SHIPPER')"><a class="dropdown-item" th:href="@{/shipper}"><i class="bi bi-truck me-2"></i>Kênh giao hàng</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post">
+                                <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                <th:block th:if="${currentUser == null}">
+                    <a th:href="@{/auth/login}" class="btn btn-sm btn-outline-primary ms-2 text-nowrap">Đăng nhập</a>
+                    <a th:href="@{/auth/register}" class="btn btn-sm btn-primary d-none d-sm-inline-block text-nowrap">Đăng ký</a>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    <div class="rb-catbar">
+        <div class="container">
+            <nav class="nav">
+                <a class="nav-link ps-0" th:href="@{/search(sort='newest')}"><i class="bi bi-grid"></i> Tất cả</a>
+                <a th:each="c : ${navCategories}" class="nav-link" th:href="@{/category/{slug}(slug=${c.slug})}"
+                   th:classappend="${currentUri == '/category/' + c.slug} ? 'active'" th:text="${c.name}"></a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<th:block th:replace="~{fragments/head :: flash}"></th:block>
+
+<main class="py-4">
+    <div layout:fragment="content"></div>
+</main>
+
+<footer class="rb-footer pt-5 pb-3 mt-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="font-serif text-white"><i class="bi bi-book-half text-warning"></i> ReBook</h5>
+                <p class="mb-2">Chuỗi cửa hàng sách cũ – nơi mỗi cuốn sách được trao cho người đọc tiếp theo.</p>
+                <p class="small mb-0">Đồ án môn Lập trình Web – HCMUTE</p>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6>Khám phá</h6>
+                <ul class="list-unstyled small">
+                    <li><a th:href="@{/search(sort='newest')}">Sách mới lên kệ</a></li>
+                    <li><a th:href="@{/search(sort='bestseller')}">Bán chạy</a></li>
+                    <li><a th:href="@{/search(sort='rating')}">Đánh giá cao</a></li>
+                    <li><a th:href="@{/stores}">Cửa hàng</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-3">
+                <h6>Hỗ trợ</h6>
+                <ul class="list-unstyled small">
+                    <li>Đổi trả trong 7 ngày</li>
+                    <li>Thanh toán COD, VNPay</li>
+                    <li><a th:href="@{/vendor/register}">Mở cửa hàng trên ReBook</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6>Liên hệ</h6>
+                <p class="small mb-1"><i class="bi bi-geo-alt"></i> 1 Võ Văn Ngân, Thủ Đức, TP.HCM</p>
+                <p class="small mb-1"><i class="bi bi-envelope"></i> hotro@rebook.vn</p>
+            </div>
+        </div>
+        <hr class="border-secondary">
+        <p class="small text-center mb-0">© 2026 ReBook · Nhóm 17 – Trần Tiến Thịnh, Phan Thanh Thiện</p>
+    </div>
+</footer>
+
+<th:block th:replace="~{fragments/head :: scripts}"></th:block>
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

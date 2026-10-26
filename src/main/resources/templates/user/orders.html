@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Đơn mua</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row g-4">
+        <div class="col-lg-3"><div th:replace="~{fragments/user-nav :: nav}"></div></div>
+        <div class="col-lg-9">
+            <div class="rb-card mb-3 overflow-auto">
+                <ul class="nav nav-underline px-3 flex-nowrap">
+                    <li class="nav-item"><a class="nav-link text-nowrap" th:classappend="${status == null} ? 'active'" th:href="@{/user/orders}">Tất cả</a></li>
+                    <li class="nav-item" th:each="s : ${statuses}">
+                        <a class="nav-link text-nowrap" th:classappend="${status == s} ? 'active'" th:href="@{/user/orders(status=${s})}">
+                            <span th:text="${s.label}"></span>
+                            <span class="badge rounded-pill bg-primary-soft text-primary" th:if="${counts.get(s) > 0}" th:text="${counts.get(s)}"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="rb-card mb-3" th:each="o : ${page.content}">
+                <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 flex-wrap">
+                    <i class="bi bi-shop text-primary"></i><strong th:text="${o.store.name}"></strong>
+                    <small class="text-muted" th:text="'#' + ${o.code} + ' · ' + ${@fmt.dateTime(o.createdAt)}"></small>
+                    <span class="badge ms-auto" th:classappend="'text-bg-' + ${o.status.color}" th:text="${o.status.label}"></span>
+                </div>
+                <a th:href="@{/user/orders/{id}(id=${o.id})}" class="d-flex gap-3 px-3 py-2 text-dark align-items-center" th:each="i, st : ${o.items}" th:if="${st.index < 2}">
+                    <th:block th:replace="~{fragments/cover :: cover(${i.product}, 'sm')}"></th:block>
+                    <div class="flex-grow-1 small"><div class="fw-semibold" th:text="${i.productTitle}"></div><span class="text-muted" th:text="'x' + ${i.quantity}"></span></div>
+                    <div class="small" th:text="${@fmt.money(i.price)}"></div>
+                </a>
+                <div class="px-3 small text-muted" th:if="${#lists.size(o.items) > 2}" th:text="'... và ' + ${#lists.size(o.items) - 2} + ' sách khác'"></div>
+                <div class="px-3 py-2 border-top d-flex align-items-center gap-2 flex-wrap">
+                    <small class="text-muted" th:text="${o.paymentMethod.name()} + ' · ' + ${o.paymentStatus.label}"></small>
+                    <span class="ms-auto">Thành tiền: <strong class="text-primary" th:text="${@fmt.money(o.total)}"></strong></span>
+                    <a th:href="@{/user/orders/{id}(id=${o.id})}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                </div>
+            </div>
+            <div class="rb-empty rb-card" th:if="${page.totalElements == 0}"><i class="bi bi-receipt"></i><p class="mt-2">Chưa có đơn hàng</p></div>
+            <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

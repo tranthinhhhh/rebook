@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Không tìm thấy</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="rb-empty rb-card py-5">
+        <i class="bi bi-journal-x"></i>
+        <h1 class="h3 mt-3 text-dark">404 - Không tìm thấy</h1>
+        <p th:text="${message ?: 'Trang bạn tìm không tồn tại hoặc đã bị xóa.'}"></p>
+        <a th:href="@{/}" class="btn btn-primary">Về trang chủ</a>
+    </div>
+</div>
+</body>
+</html>

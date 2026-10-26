@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Đánh giá sách</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="rb-card p-4">
+                <h1 class="h4 mb-3">Đánh giá sách đã mua</h1>
+                <div class="d-flex gap-3 mb-4 align-items-center">
+                    <th:block th:replace="~{fragments/cover :: cover(${item.product}, 'sm')}"></th:block>
+                    <div>
+                        <div class="fw-semibold" th:text="${item.productTitle}"></div>
+                        <small class="text-muted" th:text="'Đơn #' + ${item.order.code} + ' · ' + ${item.order.store.name}"></small>
+                    </div>
+                </div>
+                <form th:action="@{/user/reviews}" th:object="${form}" method="post" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" th:field="*{orderItemId}">
+                    <label class="form-label fw-semibold">Chất lượng sách</label>
+                    <div class="d-flex gap-2 mb-3 fs-3" id="stars">
+                        <i class="bi bi-star-fill text-warning cursor-pointer" th:each="i : ${#numbers.sequence(1,5)}" th:data-v="${i}"></i>
+                    </div>
+                    <input type="hidden" th:field="*{rating}" id="rating">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nhận xét</label>
+                        <textarea th:field="*{content}" rows="5" class="form-control" th:errorclass="is-invalid" id="content" maxlength="2000"
+                                  placeholder="Chia sẻ cảm nhận về nội dung, tình trạng sách, đóng gói, giao hàng... (tối thiểu 50 ký tự)"></textarea>
+                        <div class="invalid-feedback" th:errors="*{content}"></div>
+                        <small class="text-muted"><span id="count">0</span>/50 ký tự tối thiểu</small>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Hình ảnh hoặc video (không bắt buộc)</label>
+                        <input type="file" name="media" class="form-control" accept="image/*,video/mp4,video/webm,video/quicktime">
+                    </div>
+                    <button class="btn btn-primary px-4" type="submit">Gửi đánh giá</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="scripts">
+<script>
+    const stars = document.querySelectorAll("#stars i"), rating = document.getElementById("rating");
+    function paint(v) { stars.forEach(s => s.className = "bi cursor-pointer text-warning " + (s.dataset.v <= v ? "bi-star-fill" : "bi-star")); }
+    stars.forEach(s => s.addEventListener("click", () => { rating.value = s.dataset.v; paint(s.dataset.v); }));
+    paint(rating.value || 5);
+    const ta = document.getElementById("content"), cnt = document.getElementById("count");
+    const upd = () => { cnt.textContent = ta.value.trim().length; cnt.parentElement.classList.toggle("text-success", ta.value.trim().length >= 50); };
+    ta.addEventListener("input", upd); upd();
+</script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Chuỗi cửa hàng sách cũ</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <section class="rb-hero mb-4">
+        <div class="col-lg-7 position-relative" style="z-index:2">
+            <span class="badge bg-warning text-dark mb-3">Hơn 1.000 đầu sách cũ chất lượng</span>
+            <h1>Mỗi cuốn sách cũ<br>là một câu chuyện mới</h1>
+            <p class="lead opacity-75">Mua bán sách cũ từ chuỗi cửa hàng uy tín, giá chỉ bằng một phần giá bìa. Giao tận nơi, đổi trả trong 7 ngày.</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/search(sort='bestseller')}" class="btn btn-warning fw-semibold px-4">Khám phá ngay</a>
+                <a th:href="@{/auth/register}" class="btn btn-outline-light px-4">Đăng ký thành viên</a>
+            </div>
+        </div>
+        <div class="rb-hero-books d-flex">
+            <span style="height:150px;background:#d9a441"></span><span style="height:190px;background:#f4e6dc"></span>
+            <span style="height:170px;background:#2f5d62"></span><span style="height:210px;background:#c0392b"></span>
+            <span style="height:160px;background:#5b4a8c"></span><span style="height:185px;background:#eadfd5"></span>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="row row-cols-3 row-cols-md-4 row-cols-lg-8 g-2 g-md-3">
+            <div class="col" th:each="c : ${navCategories}">
+                <a class="rb-cat-tile" th:href="@{/category/{s}(s=${c.slug})}"><i class="bi" th:classappend="${c.icon}"></i><span th:text="${c.name}"></span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <h2 class="h4 rb-section-title mb-1">Sách bán chạy</h2>
+                <p class="text-muted small mb-0 ps-3">Những cuốn đã bán trên 10 bản tại các cửa hàng ReBook</p>
+            </div>
+            <a th:href="@{/search(sort='bestseller')}" class="small fw-semibold">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+            <div class="col" th:each="p : ${bestSellers}">
+                <div th:replace="~{fragments/product-card :: card(${p})}"></div>
+            </div>
+        </div>
+        <div class="rb-empty" th:if="${#lists.isEmpty(bestSellers)}"><i class="bi bi-book"></i><p>Chưa có dữ liệu</p></div>
+    </section>
+
+    <section class="mb-4">
+        <h2 class="h4 rb-section-title mb-3">Hệ thống cửa hàng</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+            <div class="col" th:each="s : ${stores}">
+                <a class="rb-card rb-store-card h-100 text-dark" th:href="@{/stores/{id}(id=${s.id})}">
+                    <img th:if="${s.logoUrl}" th:src="${s.logoUrl}" class="rb-store-logo" alt="">
+                    <span th:unless="${s.logoUrl}" class="rb-store-logo"><i class="bi bi-shop"></i></span>
+                    <span class="min-w-0">
+                        <span class="fw-semibold d-block text-truncate" th:text="${s.name}"></span>
+                        <small class="text-muted d-block text-truncate" th:text="${s.address}"></small>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="rb-card p-4 d-flex flex-column flex-md-row align-items-md-center gap-3 mt-5">
+        <div class="display-6 text-primary"><i class="bi bi-shop-window"></i></div>
+        <div class="flex-grow-1">
+            <h3 class="h5 mb-1">Bạn có sách cũ muốn bán?</h3>
+            <p class="text-muted mb-0">Mở cửa hàng trên ReBook miễn phí, chiết khấu chỉ từ 5% trên mỗi đơn thành công.</p>
+        </div>
+        <a th:href="@{/vendor/register}" class="btn btn-primary px-4">Mở cửa hàng</a>
+    </section>
+</div>
+</body>
+</html>

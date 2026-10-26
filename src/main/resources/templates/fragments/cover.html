@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Bìa sách: dùng ảnh nếu có, ngược lại sinh bìa từ tên sách và tác giả -->
+<th:block th:fragment="cover(p, size)">
+    <div th:if="${p.coverUrl != null and !#strings.isEmpty(p.coverUrl)}" class="book-cover" th:classappend="${size}">
+        <img th:src="${p.coverUrl}" th:alt="${p.title}" loading="lazy">
+    </div>
+    <div th:unless="${p.coverUrl != null and !#strings.isEmpty(p.coverUrl)}" class="book-cover generated" th:classappend="${size}"
+         th:style="'background:' + ${@fmt.coverColor(p.id)}">
+        <div class="gc-title" th:text="${p.title}">Tên sách</div>
+        <div><div class="gc-line"></div><div class="gc-author" th:text="${p.author}">Tác giả</div></div>
+    </div>
+</th:block>
+</html>

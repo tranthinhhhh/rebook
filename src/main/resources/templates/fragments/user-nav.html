@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="nav" class="rb-card p-3 mb-3">
+    <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom">
+        <th:block th:replace="~{fragments/avatar :: avatar(${currentUser.avatarUrl}, ${currentUser.fullName}, '')}"></th:block>
+        <div class="min-w-0">
+            <div class="fw-semibold small text-truncate" th:text="${currentUser.fullName}"></div>
+            <a th:href="@{/user/profile}" class="small text-muted"><i class="bi bi-pencil"></i> Sửa hồ sơ</a>
+        </div>
+    </div>
+    <nav class="nav flex-column small gap-1">
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${currentUri == '/user/profile'} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/profile}"><i class="bi bi-person me-2"></i>Hồ sơ của tôi</a>
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${currentUri == '/user/addresses'} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/addresses}"><i class="bi bi-geo-alt me-2"></i>Địa chỉ nhận hàng</a>
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${#strings.startsWith(currentUri, '/user/orders')} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/orders}"><i class="bi bi-receipt me-2"></i>Đơn mua</a>
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${currentUri == '/user/favorites'} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/favorites}"><i class="bi bi-heart me-2"></i>Sách yêu thích</a>
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${currentUri == '/user/viewed'} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/viewed}"><i class="bi bi-clock-history me-2"></i>Sách đã xem</a>
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${currentUri == '/user/chat'} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/chat}"><i class="bi bi-chat-dots me-2"></i>Tin nhắn</a>
+        <a class="nav-link px-2 rounded text-dark" th:classappend="${currentUri == '/user/notifications'} ? 'bg-primary-soft fw-semibold'" th:href="@{/user/notifications}"><i class="bi bi-bell me-2"></i>Thông báo</a>
+    </nav>
+</div>
+</html>

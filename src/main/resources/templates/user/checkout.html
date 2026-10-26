@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Thanh toán</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <h1 class="h3 rb-section-title mb-4">Thanh toán</h1>
+    <form th:action="@{/checkout}" th:object="${form}" method="post" id="checkoutForm">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <!-- Địa chỉ -->
+                <div class="rb-card p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h6 fw-bold mb-0"><i class="bi bi-geo-alt text-primary"></i> Địa chỉ nhận hàng</h2>
+                        <a th:href="@{/user/addresses}" class="small">Quản lý địa chỉ</a>
+                    </div>
+                    <div th:if="${#lists.isEmpty(addresses)}" class="alert alert-warning mb-0">
+                        Bạn chưa có địa chỉ nhận hàng. <a th:href="@{/user/addresses}" class="alert-link">Thêm địa chỉ</a>
+                    </div>
+                    <div class="form-check border rounded-3 p-3 ps-5 mb-2" th:each="a : ${addresses}">
+                        <input class="form-check-input" type="radio" th:field="*{addressId}" th:value="${a.id}" th:id="'addr' + ${a.id}">
+                        <label class="form-check-label w-100" th:for="'addr' + ${a.id}">
+                            <strong th:text="${a.receiverName}"></strong> · <span th:text="${a.phone}"></span>
+                            <span class="badge bg-primary-soft text-primary ms-1" th:if="${a.defaultAddress}">Mặc định</span>
+                            <div class="small text-muted" th:text="${a.fullAddress}"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Sách theo từng shop -->
+                <div class="rb-card mb-3" th:each="line : ${summary.lines}">
+                    <div class="px-3 py-2 border-bottom fw-semibold"><i class="bi bi-shop text-primary"></i> <span th:text="${line.store.name}"></span></div>
+                    <div class="px-3 py-2 d-flex gap-3 align-items-center border-bottom" th:each="i : ${line.group.items}">
+                        <th:block th:replace="~{fragments/cover :: cover(${i.product}, 'sm')}"></th:block>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="small fw-semibold" th:text="${i.product.title}"></div>
+                            <small class="text-muted" th:text="${@fmt.money(i.product.finalPrice)} + ' × ' + ${i.quantity}"></small>
+                        </div>
+                        <div class="fw-semibold" th:text="${@fmt.money(i.lineTotal)}"></div>
+                    </div>
+                    <div class="px-3 py-2 small d-flex flex-wrap gap-3 justify-content-end text-muted">
+                        <span>Tiền sách: <b class="text-dark" th:text="${@fmt.money(line.subtotal)}"></b></span>
+                        <span>Phí ship: <b class="text-dark" th:text="${@fmt.money(line.shippingFee)}"></b></span>
+                        <span th:if="${line.discount > 0}">Giảm: <b class="text-success" th:text="'-' + ${@fmt.money(line.discount)}"></b></span>
+                        <span>Tổng đơn: <b class="text-primary" th:text="${@fmt.money(line.total)}"></b></span>
+                    </div>
+                </div>
+
+                <!-- Vận chuyển -->
+                <div class="rb-card p-3 mb-3">
+                    <h2 class="h6 fw-bold"><i class="bi bi-truck text-primary"></i> Đơn vị vận chuyển</h2>
+                    <div class="row g-2">
+                        <div class="col-sm-6" th:each="c : ${carriers}">
+                            <div class="form-check border rounded-3 p-3 ps-5 h-100">
+                                <input class="form-check-input js-recalc" type="radio" th:field="*{carrierId}" th:value="${c.id}" th:id="'car' + ${c.id}">
+                                <label class="form-check-label w-100" th:for="'car' + ${c.id}">
+                                    <strong th:text="${c.name}"></strong> <span class="float-end text-primary fw-semibold" th:text="${@fmt.money(c.fee)}"></span>
+                                    <div class="small text-muted" th:text="'Dự kiến ' + ${c.estimatedTime}"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh toán -->
+                <div class="rb-card p-3 mb-3">
+                    <h2 class="h6 fw-bold"><i class="bi bi-credit-card text-primary"></i> Phương thức thanh toán</h2>
+                    <div class="form-check border rounded-3 p-3 ps-5 mb-2">
+                        <input class="form-check-input" type="radio" th:field="*{paymentMethod}" value="COD" id="payCod">
+                        <label class="form-check-label" for="payCod"><strong>Thanh toán khi nhận hàng (COD)</strong></label>
+                    </div>
+                    <div class="form-check border rounded-3 p-3 ps-5" th:classappend="${!vnpayEnabled} ? 'opacity-50'">
+                        <input class="form-check-input" type="radio" th:field="*{paymentMethod}" value="VNPAY" id="payVnpay" th:disabled="${!vnpayEnabled}">
+                        <label class="form-check-label" for="payVnpay">
+                            <strong>Thanh toán qua VNPay</strong> <span class="badge text-bg-light border">ATM / Visa / QR</span>
+                            <div class="small text-muted" th:unless="${vnpayEnabled}">Chưa cấu hình mã VNPay sandbox (xem README)</div>
+                        </label>
+                    </div>
+                </div>
+                <div class="rb-card p-3">
+                    <label class="form-label fw-semibold small">Ghi chú cho cửa hàng</label>
+                    <textarea th:field="*{note}" class="form-control" rows="2" maxlength="500" placeholder="Ví dụ: giao giờ hành chính"></textarea>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="rb-card p-3 position-sticky" style="top:140px">
+                    <h2 class="h6 fw-bold"><i class="bi bi-ticket-perforated text-primary"></i> Mã giảm giá</h2>
+                    <div class="input-group mb-2">
+                        <input type="text" th:field="*{voucherCode}" class="form-control text-uppercase" placeholder="Nhập mã">
+                        <button type="button" class="btn btn-outline-primary js-apply">Áp dụng</button>
+                    </div>
+                    <div class="small mb-2" th:if="${summary.voucherMessage}"
+                         th:classappend="${summary.discount > 0} ? 'text-success' : 'text-danger'" th:text="${summary.voucherMessage}"></div>
+                    <div class="d-flex flex-wrap gap-1 mb-3">
+                        <button type="button" class="btn btn-sm btn-light border js-voucher" th:each="v : ${vouchers}" th:data-code="${v.code}"
+                                th:title="${v.name} + ' · đơn từ ' + ${@fmt.money(v.minOrder)}">
+                            <i class="bi bi-ticket"></i> <span th:text="${v.code}"></span>
+                            <small class="text-muted" th:text="${v.store != null} ? '(' + ${v.store.name} + ')' : '(Toàn sàn)'"></small>
+                        </button>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-1"><span class="text-muted">Tiền sách</span><span th:text="${@fmt.money(summary.subtotal)}"></span></div>
+                    <div class="d-flex justify-content-between mb-1"><span class="text-muted">Phí vận chuyển</span><span th:text="${@fmt.money(summary.shippingFee)}"></span></div>
+                    <div class="d-flex justify-content-between mb-1" th:if="${summary.discount > 0}"><span class="text-muted">Giảm giá</span><span class="text-success" th:text="'-' + ${@fmt.money(summary.discount)}"></span></div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-semibold">Tổng thanh toán</span>
+                        <span class="h4 text-primary fw-bold mb-0" th:text="${@fmt.money(summary.total)}"></span>
+                    </div>
+                    <button class="btn btn-primary w-100 py-2" type="submit" th:disabled="${#lists.isEmpty(addresses)}">Đặt hàng</button>
+                    <p class="small text-muted mt-2 mb-0" th:if="${#lists.size(summary.lines) > 1}">
+                        <i class="bi bi-info-circle"></i> Giỏ hàng có sách của <span th:text="${#lists.size(summary.lines)}"></span> cửa hàng nên sẽ tạo <span th:text="${#lists.size(summary.lines)}"></span> đơn riêng.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block layout:fragment="scripts">
+<script>
+    // Tính lại tiền khi đổi đơn vị vận chuyển hoặc mã giảm giá (gọi lại GET /checkout)
+    function recalc() {
+        const f = document.getElementById("checkoutForm");
+        const params = new URLSearchParams();
+        ["addressId", "carrierId", "paymentMethod"].forEach(n => {
+            const el = f.querySelector(`[name=${n}]:checked`);
+            if (el) params.set(n, el.value);
+        });
+        params.set("voucherCode", f.querySelector("[name=voucherCode]").value.trim());
+        params.set("note", f.querySelector("[name=note]").value);
+        location.href = "/checkout?" + params.toString();
+    }
+    document.querySelectorAll(".js-recalc").forEach(el => el.addEventListener("change", recalc));
+    document.querySelector(".js-apply").addEventListener("click", recalc);
+    document.querySelectorAll(".js-voucher").forEach(b => b.addEventListener("click", () => {
+        document.querySelector("[name=voucherCode]").value = b.dataset.code;
+        recalc();
+    }));
+</script>
+</th:block>
+</body>
+</html>

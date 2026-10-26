@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Đăng nhập</title></head>
+<body>
+<div layout:fragment="content" class="container rb-auth">
+    <div class="row justify-content-center w-100 mx-0">
+        <div class="col-md-7 col-lg-5">
+            <div class="rb-card shadow-sm">
+                <h1 class="h3 text-center mb-1">Đăng nhập</h1>
+                <p class="text-center text-muted mb-4">Chào mừng bạn quay lại ReBook</p>
+                <div class="alert alert-danger" th:if="${error}">
+                    <span th:text="${error}"></span>
+                    <a th:if="${unverifiedEmail}" th:href="@{/auth/verify(email=${unverifiedEmail})}" class="alert-link">Kích hoạt ngay</a>
+                </div>
+                <form th:action="@{/auth/login}" method="post" novalidate>
+                    <input type="hidden" name="redirect" th:value="${redirect}">
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" th:value="${email}" required autofocus placeholder="ban@email.com">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" for="password">Mật khẩu</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="text-end mb-3"><a th:href="@{/auth/forgot}" class="small">Quên mật khẩu?</a></div>
+                    <button class="btn btn-primary w-100 py-2" type="submit">Đăng nhập</button>
+                </form>
+                <p class="text-center mt-4 mb-0">Chưa có tài khoản? <a th:href="@{/auth/register}" class="fw-semibold">Đăng ký ngay</a></p>
+            </div>
+            <details class="rb-card mt-3 p-3 small">
+                <summary class="fw-semibold cursor-pointer">Tài khoản demo (mật khẩu: 123456a)</summary>
+                <table class="table table-sm mt-2 mb-0">
+                    <tr><td>Admin</td><td>admin@rebook.vn</td></tr>
+                    <tr><td>Manager</td><td>manager@rebook.vn</td></tr>
+                    <tr><td>Vendor</td><td>vendor1@rebook.vn</td></tr>
+                    <tr><td>Shipper</td><td>shipper1@rebook.vn</td></tr>
+                    <tr><td>User</td><td>user1@rebook.vn</td></tr>
+                </table>
+            </details>
+        </div>
+    </div>
+</div>
+</body>
+</html>

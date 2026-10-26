@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="card(p)" class="book-card">
+    <a th:href="@{/books/{id}(id=${p.id})}" class="book-cover-wrap d-block">
+        <span class="rb-discount" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
+        <span class="rb-condition" th:text="${#strings.substringBefore(p.bookCondition.label, ' (')}"></span>
+        <th:block th:replace="~{fragments/cover :: cover(${p}, '')}"></th:block>
+    </a>
+    <div class="book-body">
+        <a th:href="@{/books/{id}(id=${p.id})}" class="book-title" th:text="${p.title}" th:title="${p.title}"></a>
+        <div class="book-author" th:text="${p.author}"></div>
+        <div class="mt-auto pt-2">
+            <div class="d-flex align-items-baseline gap-2 flex-wrap">
+                <span class="book-price" th:text="${@fmt.money(p.finalPrice)}"></span>
+                <span class="book-old-price" th:if="${p.originalPrice > p.finalPrice}" th:text="${@fmt.money(p.originalPrice)}"></span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center book-meta mt-1">
+                <span><i class="bi bi-star-fill text-warning"></i> <span th:text="${p.ratingCount > 0 ? @fmt.rating(p.ratingAvg) : 'Mới'}"></span></span>
+                <span th:text="'Đã bán ' + ${p.soldCount}"></span>
+            </div>
+            <div class="book-meta text-truncate mt-1"><i class="bi bi-shop"></i> <span th:text="${p.store.name}"></span></div>
+        </div>
+    </div>
+</div>
+</html>

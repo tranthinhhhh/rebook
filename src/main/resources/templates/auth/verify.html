@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Kích hoạt tài khoản</title></head>
+<body>
+<div layout:fragment="content" class="container rb-auth">
+    <div class="row justify-content-center w-100 mx-0">
+        <div class="col-md-7 col-lg-5">
+            <div class="rb-card shadow-sm text-center">
+                <div class="display-5 text-primary mb-2"><i class="bi bi-envelope-check"></i></div>
+                <h1 class="h4">Nhập mã OTP</h1>
+                <p class="text-muted">Mã gồm 6 chữ số đã được gửi tới <strong th:text="${email}"></strong>. Mã có hiệu lực trong 5 phút.</p>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <form th:action="@{/auth/verify}" method="post">
+                    <input type="hidden" name="email" th:value="${email}">
+                    <input type="text" name="otp" class="form-control rb-otp-input mb-3" maxlength="6" inputmode="numeric"
+                           pattern="\d{6}" autocomplete="one-time-code" required autofocus>
+                    <button class="btn btn-primary w-100 py-2" type="submit">Kích hoạt tài khoản</button>
+                </form>
+                <form th:action="@{/auth/resend}" method="post" class="mt-3">
+                    <input type="hidden" name="email" th:value="${email}">
+                    <span class="small text-muted">Chưa nhận được mã?</span>
+                    <button class="btn btn-link btn-sm p-0 align-baseline" type="submit">Gửi lại</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

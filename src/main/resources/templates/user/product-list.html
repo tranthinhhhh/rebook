@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title th:text="${title}">Danh sách</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row g-4">
+        <div class="col-lg-3"><div th:replace="~{fragments/user-nav :: nav}"></div></div>
+        <div class="col-lg-9">
+            <h1 class="h4 rb-section-title mb-3" th:text="${title}"></h1>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                <div class="col" th:each="p : ${page.content}">
+                    <div th:replace="~{fragments/product-card :: card(${p})}"></div>
+                </div>
+            </div>
+            <div class="rb-empty rb-card" th:if="${page.totalElements == 0}"><i class="bi" th:classappend="${icon}"></i><p class="mt-2">Danh sách trống</p></div>
+            <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

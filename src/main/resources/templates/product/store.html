@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title th:text="${store.name}">Cửa hàng</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="rb-store-banner mb-n5" th:style="${store.bannerUrl} ? 'background-image:url(' + ${store.bannerUrl} + ')' : ''"></div>
+    <div class="rb-card p-3 p-md-4 mx-md-4 position-relative mb-4 d-flex gap-3 align-items-center flex-wrap">
+        <img th:if="${store.logoUrl}" th:src="${store.logoUrl}" class="rb-store-logo" style="width:80px;height:80px" alt="">
+        <span th:unless="${store.logoUrl}" class="rb-store-logo" style="width:80px;height:80px;font-size:2rem"><i class="bi bi-shop"></i></span>
+        <div class="flex-grow-1">
+            <h1 class="h4 mb-1" th:text="${store.name}"></h1>
+            <div class="small text-muted"><i class="bi bi-geo-alt"></i> <span th:text="${store.address}"></span>
+                · <i class="bi bi-telephone"></i> <span th:text="${store.phone}"></span>
+                · <span th:text="${page.totalElements} + ' đầu sách'"></span></div>
+            <p class="small mb-0 mt-2" th:if="${store.description}" th:text="${store.description}"></p>
+        </div>
+        <a th:href="@{/user/chat(store=${store.id})}" class="btn btn-primary"><i class="bi bi-chat-dots"></i> Chat với shop</a>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+        <form method="get" class="d-flex gap-2">
+            <input type="search" name="q" class="form-control form-control-sm" placeholder="Tìm trong shop..." th:value="${filter.q}">
+            <input type="hidden" name="sort" th:value="${filter.sort}">
+            <button class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
+        </form>
+        <div class="btn-group btn-group-sm flex-wrap">
+            <a th:each="s : ${ {'newest','bestseller','rating','price_asc'} }" class="btn btn-outline-primary"
+               th:classappend="${filter.sort == s} ? 'active'" th:href="${@fmt.withParam('sort', s)}"
+               th:text="${s == 'newest'} ? 'Mới nhất' : (${s == 'bestseller'} ? 'Bán chạy' : (${s == 'rating'} ? 'Đánh giá' : 'Giá thấp'))"></a>
+        </div>
+    </div>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+        <div class="col" th:each="p : ${page.content}">
+            <div th:replace="~{fragments/product-card :: card(${p})}"></div>
+        </div>
+    </div>
+    <div class="rb-empty" th:if="${page.totalElements == 0}"><i class="bi bi-journal-x"></i><p>Không có sách phù hợp</p></div>
+    <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+</div>
+</body>
+</html>

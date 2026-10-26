@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="table(vouchers, base)" class="rb-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead><tr><th>Mã</th><th>Chương trình</th><th>Loại</th><th>Mức giảm</th><th>Điều kiện</th><th>Thời gian</th><th>Đã dùng</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="v : ${vouchers}">
+                <td><span class="badge bg-primary-soft text-primary fs-6" th:text="${v.code}"></span></td>
+                <td th:text="${v.name}"></td>
+                <td th:text="${v.type.label}"></td>
+                <td><strong th:text="${v.percent} + '%'"></strong><div class="text-muted" th:if="${v.maxDiscount > 0}" th:text="'tối đa ' + ${@fmt.money(v.maxDiscount)}"></div></td>
+                <td th:text="'Đơn từ ' + ${@fmt.money(v.minOrder)}"></td>
+                <td><div th:text="${@fmt.date(v.startAt)}"></div><div class="text-muted" th:text="'→ ' + ${@fmt.date(v.endAt)}"></div></td>
+                <td th:text="${v.usedCount} + '/' + ${v.quantity}"></td>
+                <td><span class="badge" th:classappend="${v.usable} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${v.usable} ? 'Đang chạy' : 'Không hiệu lực'"></span></td>
+                <td class="text-nowrap text-end">
+                    <a th:href="@{__${base}__/{id}/edit(id=${v.id})}" class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></a>
+                    <form th:action="@{__${base}__/{id}/delete(id=${v.id})}" method="post" class="d-inline" data-confirm="Xóa mã khuyến mãi này? (Mã đã được dùng sẽ chỉ bị tắt)">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="rb-empty" th:if="${#lists.isEmpty(vouchers)}"><i class="bi bi-ticket-perforated"></i><p>Chưa có mã khuyến mãi</p></div>
+</div>
+</html>

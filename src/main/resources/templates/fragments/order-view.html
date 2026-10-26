@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Chi tiết đơn hàng dùng chung cho User / Vendor / Admin / Shipper -->
+<div th:fragment="view(order, viewer)">
+    <div class="rb-card p-3 p-md-4 mt-2 mb-3">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+            <h1 class="h5 mb-0" th:text="'Đơn hàng #' + ${order.code}"></h1>
+            <span class="badge" th:classappend="'text-bg-' + ${order.status.color}" th:text="${order.status.label}"></span>
+            <small class="text-muted ms-auto" th:text="'Đặt lúc ' + ${@fmt.dateTime(order.createdAt)}"></small>
+        </div>
+        <div class="rb-timeline mb-2" th:unless="${order.status.name() == 'CANCELLED' or order.status.name() == 'RETURNED'}"
+             th:with="steps=${ {'NEW','CONFIRMED','PICKED_UP','SHIPPING','DELIVERED'} }, idx=${ {'NEW','CONFIRMED','PICKED_UP','SHIPPING','DELIVERED'}.indexOf(order.status.name()) }">
+            <div class="step" th:each="s, st : ${steps}" th:classappend="${st.index <= idx} ? 'done'">
+                <div class="dot"><i class="bi" th:classappend="${ {'bi-receipt','bi-check2','bi-box-seam','bi-truck','bi-house-check'}[st.index] }"></i></div>
+                <span th:text="${T(vn.hcmute.rebook.entity.enums.OrderStatus).valueOf(s).label}"></span>
+            </div>
+        </div>
+        <div class="alert mb-0" th:if="${order.status.name() == 'CANCELLED' or order.status.name() == 'RETURNED'}"
+             th:classappend="${order.status.name() == 'CANCELLED'} ? 'alert-danger' : 'alert-secondary'">
+            <i class="bi bi-info-circle"></i> <span th:text="${order.status.label}"></span>
+            <span th:if="${order.paymentStatus.name() == 'REFUNDED'}"> · Đã hoàn tiền</span>
+        </div>
+    </div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <div class="rb-card p-3 h-100">
+                <h2 class="h6 fw-bold"><i class="bi bi-geo-alt text-primary"></i> Người nhận</h2>
+                <div class="fw-semibold" th:text="${order.receiverName} + ' · ' + ${order.receiverPhone}"></div>
+                <div class="small text-muted" th:text="${order.shippingAddress}"></div>
+                <div class="small mt-2" th:if="${order.note}"><i class="bi bi-chat-left-text"></i> <span th:text="${order.note}"></span></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="rb-card p-3 h-100 small">
+                <h2 class="h6 fw-bold"><i class="bi bi-truck text-primary"></i> Vận chuyển & thanh toán</h2>
+                <div>Cửa hàng: <strong th:text="${order.store.name}"></strong></div>
+                <div>Đơn vị vận chuyển: <strong th:text="${order.carrier != null} ? ${order.carrier.name} : '—'"></strong></div>
+                <div>Shipper: <strong th:text="${order.shipper != null} ? ${order.shipper.fullName} + ' (' + ${order.shipper.phone} + ')' : 'Chưa phân công'"></strong></div>
+                <div>Thanh toán: <strong th:text="${order.paymentMethod.label}"></strong> · <span th:text="${order.paymentStatus.label}"></span></div>
+                <div th:if="${order.deliveredAt}">Giao thành công: <span th:text="${@fmt.dateTime(order.deliveredAt)}"></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="rb-card">
+        <div class="d-flex gap-3 px-3 py-2 border-bottom align-items-center" th:each="i : ${order.items}">
+            <th:block th:replace="~{fragments/cover :: cover(${i.product}, 'sm')}"></th:block>
+            <div class="flex-grow-1 min-w-0">
+                <a th:href="@{/books/{id}(id=${i.product.id})}" class="fw-semibold text-dark" th:text="${i.productTitle}"></a>
+                <div class="small text-muted" th:text="${@fmt.money(i.price)} + ' × ' + ${i.quantity}"></div>
+            </div>
+            <a th:if="${viewer == 'user' and order.status.name() == 'DELIVERED' and !i.reviewed}" th:href="@{/user/reviews/new(item=${i.id})}"
+               class="btn btn-sm btn-primary text-nowrap"><i class="bi bi-star"></i> Đánh giá</a>
+            <span th:if="${viewer == 'user' and i.reviewed}" class="badge bg-primary-soft text-primary">Đã đánh giá</span>
+            <div class="fw-semibold text-nowrap" th:text="${@fmt.money(i.lineTotal)}"></div>
+        </div>
+        <div class="p-3">
+            <div class="d-flex justify-content-end gap-4"><span class="text-muted">Tiền sách</span><span style="min-width:110px" class="text-end" th:text="${@fmt.money(order.subtotal)}"></span></div>
+            <div class="d-flex justify-content-end gap-4"><span class="text-muted">Phí vận chuyển</span><span style="min-width:110px" class="text-end" th:text="${@fmt.money(order.shippingFee)}"></span></div>
+            <div class="d-flex justify-content-end gap-4" th:if="${order.discount > 0}"><span class="text-muted" th:text="'Giảm giá (' + ${order.voucherCode} + ')'"></span><span style="min-width:110px" class="text-end text-success" th:text="'-' + ${@fmt.money(order.discount)}"></span></div>
+            <div class="d-flex justify-content-end gap-4 mt-1"><span class="fw-semibold">Tổng cộng</span><span style="min-width:110px" class="text-end h5 text-primary mb-0" th:text="${@fmt.money(order.total)}"></span></div>
+        </div>
+    </div>
+</div>
+</html>

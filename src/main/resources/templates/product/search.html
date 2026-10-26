@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title th:text="${heading}">Tìm kiếm</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a th:href="@{/}">Trang chủ</a></li>
+            <li class="breadcrumb-item active" th:text="${heading}"></li>
+        </ol>
+    </nav>
+    <div class="row g-4">
+        <aside class="col-lg-3">
+            <form method="get" class="rb-card p-3" id="filterForm">
+                <input type="hidden" name="q" th:value="${filter.q}">
+                <input type="hidden" name="sort" th:value="${filter.sort}">
+                <h2 class="h6 fw-bold mb-3"><i class="bi bi-funnel"></i> Bộ lọc</h2>
+                <div class="mb-3" th:unless="${category}">
+                    <label class="form-label small fw-semibold">Danh mục</label>
+                    <select name="categoryId" class="form-select form-select-sm">
+                        <option value="">Tất cả danh mục</option>
+                        <option th:each="c : ${navCategories}" th:value="${c.id}" th:text="${c.name}" th:selected="${filter.categoryId == c.id}"></option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Khoảng giá (đ)</label>
+                    <div class="d-flex gap-2">
+                        <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Từ" min="0" step="1000" th:value="${filter.minPrice}">
+                        <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Đến" min="0" step="1000" th:value="${filter.maxPrice}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Tình trạng sách</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="condition" value="" id="cond-all" th:checked="${filter.condition == null}">
+                        <label class="form-check-label small" for="cond-all">Tất cả</label>
+                    </div>
+                    <div class="form-check" th:each="c : ${conditions}">
+                        <input class="form-check-input" type="radio" name="condition" th:value="${c}" th:id="'cond-' + ${c}" th:checked="${filter.condition == c}">
+                        <label class="form-check-label small" th:for="'cond-' + ${c}" th:text="${c.label}"></label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Đánh giá</label>
+                    <select name="minRating" class="form-select form-select-sm">
+                        <option value="">Tất cả</option>
+                        <option value="4" th:selected="${filter.minRating == 4}">Từ 4 sao</option>
+                        <option value="3" th:selected="${filter.minRating == 3}">Từ 3 sao</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Cửa hàng</label>
+                    <select name="storeId" class="form-select form-select-sm">
+                        <option value="">Tất cả cửa hàng</option>
+                        <option th:each="s : ${stores}" th:value="${s.id}" th:text="${s.name}" th:selected="${filter.storeId == s.id}"></option>
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-sm w-100" type="submit">Áp dụng</button>
+                <a th:href="${category} ? @{/category/{s}(s=${category.slug})} : @{/search}" class="btn btn-link btn-sm w-100 mt-1">Xóa bộ lọc</a>
+            </form>
+        </aside>
+        <section class="col-lg-9">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h1 class="h4 mb-0" th:text="${heading}"></h1>
+                    <small class="text-muted" th:text="${page.totalElements} + ' đầu sách'"></small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small text-muted text-nowrap">Sắp xếp</span>
+                    <select class="form-select form-select-sm" onchange="location.href=this.value">
+                        <option th:each="s : ${ {'newest','bestseller','rating','favorite','price_asc','price_desc'} }"
+                                th:value="${@fmt.withParam('sort', s)}" th:selected="${filter.sort == s}"
+                                th:text="${s == 'newest'} ? 'Mới nhất' : (${s == 'bestseller'} ? 'Bán chạy' : (${s == 'rating'} ? 'Đánh giá cao' : (${s == 'favorite'} ? 'Yêu thích nhất' : (${s == 'price_asc'} ? 'Giá tăng dần' : 'Giá giảm dần'))))"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                <div class="col" th:each="p : ${page.content}">
+                    <div th:replace="~{fragments/product-card :: card(${p})}"></div>
+                </div>
+            </div>
+            <div class="rb-empty rb-card" th:if="${page.totalElements == 0}">
+                <i class="bi bi-search"></i>
+                <p class="mt-2 mb-0">Không tìm thấy sách phù hợp. Thử từ khóa hoặc bộ lọc khác nhé.</p>
+            </div>
+            <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

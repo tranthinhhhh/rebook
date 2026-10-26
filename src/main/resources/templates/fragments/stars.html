@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<span th:fragment="stars(value)" class="rb-stars">
+    <i th:each="i : ${#numbers.sequence(1, 5)}"
+       th:class="${value >= i} ? 'bi bi-star-fill' : (${value >= i - 0.5} ? 'bi bi-star-half' : 'bi bi-star')"></i>
+</span>
+</html>

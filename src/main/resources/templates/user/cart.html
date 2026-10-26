@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Giỏ hàng</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <h1 class="h3 rb-section-title mb-4">Giỏ hàng</h1>
+    <div class="rb-empty rb-card" th:if="${#lists.isEmpty(groups)}">
+        <i class="bi bi-bag"></i>
+        <p class="mt-2">Giỏ hàng của bạn đang trống</p>
+        <a th:href="@{/}" class="btn btn-primary">Tiếp tục mua sắm</a>
+    </div>
+    <div class="row g-4" th:unless="${#lists.isEmpty(groups)}">
+        <div class="col-lg-8">
+            <div class="rb-card mb-3" th:each="g : ${groups}">
+                <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2">
+                    <i class="bi bi-shop text-primary"></i>
+                    <a th:href="@{/stores/{id}(id=${g.store.id})}" class="fw-semibold text-dark" th:text="${g.store.name}"></a>
+                    <a th:href="@{/user/chat(store=${g.store.id})}" class="small ms-auto"><i class="bi bi-chat-dots"></i> Chat</a>
+                </div>
+                <div class="p-3 d-flex gap-3 border-bottom align-items-center flex-wrap flex-sm-nowrap" th:each="i : ${g.items}">
+                    <a th:href="@{/books/{id}(id=${i.product.id})}"><th:block th:replace="~{fragments/cover :: cover(${i.product}, 'sm')}"></th:block></a>
+                    <div class="flex-grow-1 min-w-0">
+                        <a th:href="@{/books/{id}(id=${i.product.id})}" class="fw-semibold text-dark d-block" th:text="${i.product.title}"></a>
+                        <small class="text-muted d-block" th:text="${i.product.author} + ' · ' + ${i.product.bookCondition.label}"></small>
+                        <small class="text-danger" th:if="${!i.product.available}">Sách đã ngừng bán hoặc hết hàng</small>
+                        <small class="text-muted" th:if="${i.product.available}" th:text="'Còn ' + ${i.product.stock} + ' cuốn'"></small>
+                    </div>
+                    <div class="text-end" style="min-width:110px">
+                        <div class="fw-semibold text-primary" th:text="${@fmt.money(i.product.finalPrice)}"></div>
+                        <small class="text-muted text-decoration-line-through" th:if="${i.product.discountPercent > 0}" th:text="${@fmt.money(i.product.price)}"></small>
+                    </div>
+                    <form th:action="@{/cart/update}" method="post" class="d-flex">
+                        <input type="hidden" name="itemId" th:value="${i.id}">
+                        <input type="number" name="quantity" class="form-control form-control-sm text-center" style="width:70px"
+                               th:value="${i.quantity}" min="1" th:max="${i.product.stock}" onchange="this.form.submit()">
+                    </form>
+                    <div class="fw-bold text-end" style="min-width:100px" th:text="${@fmt.money(i.lineTotal)}"></div>
+                    <form th:action="@{/cart/remove}" method="post" data-confirm="Xóa sách này khỏi giỏ hàng?">
+                        <input type="hidden" name="itemId" th:value="${i.id}">
+                        <button class="btn btn-sm btn-link text-danger" title="Xóa"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="rb-card p-3 position-sticky" style="top:140px">
+                <h2 class="h6 fw-bold">Tóm tắt</h2>
+                <div class="d-flex justify-content-between mb-2"><span class="text-muted">Tạm tính</span><span class="fw-semibold" th:text="${@fmt.money(total)}"></span></div>
+                <p class="small text-muted">Phí vận chuyển và mã giảm giá được tính ở bước thanh toán. Đơn từ nhiều cửa hàng sẽ được tách thành nhiều đơn.</p>
+                <a th:href="@{/checkout}" class="btn btn-primary w-100 py-2">Tiến hành thanh toán</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<head><title>Hồ sơ của tôi</title></head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="row g-4">
+        <div class="col-lg-3"><div th:replace="~{fragments/user-nav :: nav}"></div></div>
+        <div class="col-lg-9">
+            <div class="row g-3 mb-3">
+                <div class="col-6 col-md-3" th:each="s : ${ {'NEW','SHIPPING','DELIVERED','RETURNED'} }">
+                    <a class="rb-card d-block p-3 text-center text-dark" th:href="@{/user/orders(status=${s})}">
+                        <div class="h4 mb-0 text-primary" th:text="${orderCounts.get(T(vn.hcmute.rebook.entity.enums.OrderStatus).valueOf(s))}"></div>
+                        <small class="text-muted" th:text="${T(vn.hcmute.rebook.entity.enums.OrderStatus).valueOf(s).label}"></small>
+                    </a>
+                </div>
+            </div>
+            <div class="rb-card p-4 mb-3">
+                <h1 class="h5 mb-1">Hồ sơ của tôi</h1>
+                <p class="text-muted small">Quản lý thông tin để bảo mật tài khoản</p>
+                <form th:action="@{/user/profile}" th:object="${profileForm}" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="text" class="form-control" th:value="${user.email}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" th:field="*{fullName}" th:errorclass="is-invalid">
+                                <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" th:field="*{phone}" th:errorclass="is-invalid">
+                                <div class="invalid-feedback" th:errors="*{phone}"></div>
+                            </div>
+                            <p class="small text-muted">Vai trò: <strong th:text="${user.role.label}"></strong> · Tham gia ngày <span th:text="${@fmt.date(user.createdAt)}"></span></p>
+                            <button class="btn btn-primary px-4" type="submit">Lưu thay đổi</button>
+                        </div>
+                        <div class="col-md-4 text-center border-start-md">
+                            <th:block th:replace="~{fragments/avatar :: avatar(${user.avatarUrl}, ${user.fullName}, 'rb-avatar-lg mb-3')}"></th:block>
+                            <input type="file" name="avatar" class="form-control form-control-sm" accept="image/*">
+                            <small class="text-muted d-block mt-1">Ảnh JPG, PNG tối đa 20MB</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="rb-card p-4">
+                <h2 class="h5 mb-3">Đổi mật khẩu</h2>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <form th:action="@{/user/password}" th:object="${passwordForm}" method="post" class="row g-3" novalidate>
+                    <div class="col-md-4">
+                        <label class="form-label small">Mật khẩu hiện tại</label>
+                        <input type="password" class="form-control" th:field="*{currentPassword}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{currentPassword}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">Mật khẩu mới</label>
+                        <input type="password" class="form-control" th:field="*{newPassword}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{newPassword}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">Nhập lại mật khẩu mới</label>
+                        <input type="password" class="form-control" th:field="*{confirmPassword}" th:classappend="${#fields.hasErrors('passwordMatched')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{passwordMatched}"></div>
+                    </div>
+                    <div class="col-12"><button class="btn btn-outline-primary" type="submit">Đổi mật khẩu</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
