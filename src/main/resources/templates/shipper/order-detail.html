@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title th:text="'Đơn #' + ${order.code}">Đơn hàng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Giao đơn hàng</h1>
+<div layout:fragment="content">
+    <a th:href="@{/shipper/orders}" class="small"><i class="bi bi-arrow-left"></i> Danh sách đơn</a>
+    <div class="rb-card p-3 mt-2 d-flex flex-wrap gap-2 align-items-center">
+        <strong class="me-2">Cập nhật:</strong>
+        <form th:if="${order.status.name() == 'CONFIRMED'}" th:action="@{/shipper/orders/{id}/status(id=${order.id})}" method="post">
+            <input type="hidden" name="status" value="PICKED_UP"><button class="btn btn-sm btn-primary"><i class="bi bi-box-seam"></i> Đã lấy hàng tại shop</button>
+        </form>
+        <form th:if="${order.status.name() == 'PICKED_UP'}" th:action="@{/shipper/orders/{id}/status(id=${order.id})}" method="post">
+            <input type="hidden" name="status" value="SHIPPING"><button class="btn btn-sm btn-primary"><i class="bi bi-truck"></i> Bắt đầu giao</button>
+        </form>
+        <form th:if="${order.status.name() == 'SHIPPING'}" th:action="@{/shipper/orders/{id}/status(id=${order.id})}" method="post"
+              data-confirm="Xác nhận đã giao thành công và thu đủ tiền (nếu COD)?">
+            <input type="hidden" name="status" value="DELIVERED"><button class="btn btn-sm btn-success"><i class="bi bi-house-check"></i> Đã giao thành công</button>
+        </form>
+        <form th:if="${order.status.name() == 'SHIPPING'}" th:action="@{/shipper/orders/{id}/status(id=${order.id})}" method="post"
+              data-confirm="Báo giao hàng thất bại? Đơn sẽ bị hủy và sách hoàn về shop.">
+            <input type="hidden" name="status" value="CANCELLED"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i> Giao thất bại</button>
+        </form>
+        <span class="small text-muted" th:if="${order.status.name() == 'DELIVERED' or order.status.name() == 'CANCELLED' or order.status.name() == 'RETURNED'}">Đơn đã hoàn tất.</span>
+        <a th:href="'tel:' + ${order.receiverPhone}" class="btn btn-sm btn-light border ms-auto"><i class="bi bi-telephone"></i> Gọi người nhận</a>
+    </div>
+    <div th:replace="~{fragments/order-view :: view(${order}, 'shipper')}"></div>
+</div>
+</body>
+</html>

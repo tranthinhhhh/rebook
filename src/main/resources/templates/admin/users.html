@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Người dùng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Quản lý người dùng</h1>
+<div layout:fragment="content">
+    <form class="d-flex gap-2 mb-3 flex-wrap" method="get">
+        <input type="search" name="q" class="form-control form-control-sm" style="width:260px" placeholder="Tên, email, số điện thoại" th:value="${q}">
+        <select name="role" class="form-select form-select-sm" style="width:180px">
+            <option value="">Mọi vai trò</option>
+            <option th:each="r : ${roles}" th:value="${r}" th:text="${r.label}" th:selected="${role == r}"></option>
+        </select>
+        <button class="btn btn-sm btn-primary">Tìm kiếm</button>
+    </form>
+    <div class="rb-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead><tr><th>Người dùng</th><th>Số điện thoại</th><th>Vai trò</th><th>Ngày tham gia</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr></thead>
+                <tbody>
+                <tr th:each="u : ${page.content}">
+                    <td><div class="d-flex align-items-center gap-2">
+                        <th:block th:replace="~{fragments/avatar :: avatar(${u.avatarUrl}, ${u.fullName}, '')}"></th:block>
+                        <div><div class="fw-semibold" th:text="${u.fullName}"></div><small class="text-muted" th:text="${u.email}"></small></div></div></td>
+                    <td th:text="${u.phone}"></td>
+                    <td>
+                        <form sec:authorize="hasRole('ADMIN')" th:action="@{/admin/accounts/{id}/role(id=${u.id})}" method="post" class="d-flex gap-1"
+                              th:if="${u.id != currentUser.id}">
+                            <select name="role" class="form-select form-select-sm" style="width:140px" onchange="this.form.submit()">
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r.label}" th:selected="${u.role == r}"></option>
+                            </select>
+                        </form>
+                        <span sec:authorize="!hasRole('ADMIN')" class="badge bg-primary-soft text-primary" th:text="${u.role.label}"></span>
+                        <span sec:authorize="hasRole('ADMIN')" th:if="${u.id == currentUser.id}" class="badge bg-primary-soft text-primary" th:text="${u.role.label}"></span>
+                    </td>
+                    <td th:text="${@fmt.date(u.createdAt)}"></td>
+                    <td>
+                        <span class="badge text-bg-danger" th:if="${u.locked}">Bị khóa</span>
+                        <span class="badge text-bg-warning" th:if="${!u.locked and !u.enabled}">Chưa kích hoạt</span>
+                        <span class="badge text-bg-success" th:if="${!u.locked and u.enabled}">Hoạt động</span>
+                    </td>
+                    <td class="text-end">
+                        <form th:if="${u.id != currentUser.id and u.role.name() != 'ADMIN'}" th:action="@{/admin/users/{id}/lock(id=${u.id})}" method="post"
+                              th:attr="data-confirm=${u.locked} ? 'Mở khóa tài khoản này?' : 'Khóa tài khoản này? Người dùng sẽ không thể đăng nhập.'">
+                            <input type="hidden" name="locked" th:value="${!u.locked}">
+                            <button class="btn btn-sm" th:classappend="${u.locked} ? 'btn-outline-success' : 'btn-outline-danger'"
+                                    th:text="${u.locked} ? 'Mở khóa' : 'Khóa'"></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Sách các cửa hàng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Sách của các cửa hàng</h1>
+<div layout:fragment="content">
+    <form class="d-flex gap-2 mb-3 flex-wrap" method="get">
+        <input type="search" name="q" class="form-control form-control-sm" style="width:240px" placeholder="Tên sách, tác giả" th:value="${q}">
+        <select name="storeId" class="form-select form-select-sm" style="width:220px">
+            <option value="">Tất cả cửa hàng</option>
+            <option th:each="s : ${stores}" th:value="${s.id}" th:text="${s.name}" th:selected="${storeId == s.id}"></option>
+        </select>
+        <select name="status" class="form-select form-select-sm" style="width:160px">
+            <option value="">Mọi trạng thái</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${status == s}"></option>
+        </select>
+        <button class="btn btn-sm btn-primary">Lọc</button>
+    </form>
+    <div class="rb-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead><tr><th>Sách</th><th>Cửa hàng</th><th>Danh mục</th><th class="text-end">Giá</th><th class="text-center">Kho</th><th class="text-center">Đã bán</th><th>Trạng thái</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${page.content}">
+                    <td><div class="d-flex gap-2 align-items-center">
+                        <th:block th:replace="~{fragments/cover :: cover(${p}, 'sm')}"></th:block>
+                        <div><a th:href="@{/books/{id}(id=${p.id})}" target="_blank" class="fw-semibold text-dark" th:text="${p.title}"></a><br><small class="text-muted" th:text="${p.author}"></small></div></div></td>
+                    <td th:text="${p.store.name}"></td>
+                    <td th:text="${p.category.name}"></td>
+                    <td class="text-end" th:text="${@fmt.money(p.finalPrice)}"></td>
+                    <td class="text-center" th:text="${p.stock}"></td>
+                    <td class="text-center" th:text="${p.soldCount}"></td>
+                    <td><span class="badge" th:classappend="${p.status.name() == 'ACTIVE'} ? 'text-bg-success' : (${p.status.name() == 'BANNED'} ? 'text-bg-danger' : 'text-bg-secondary')" th:text="${p.status.label}"></span></td>
+                    <td class="text-end">
+                        <form th:action="@{/admin/products/{id}/status(id=${p.id})}" method="post"
+                              th:attr="data-confirm=${p.status.name() == 'BANNED'} ? 'Mở lại sách này?' : 'Cấm bán sách này? Người bán sẽ nhận được thông báo.'">
+                            <input type="hidden" name="status" th:value="${p.status.name() == 'BANNED'} ? 'ACTIVE' : 'BANNED'">
+                            <button class="btn btn-sm" th:classappend="${p.status.name() == 'BANNED'} ? 'btn-outline-success' : 'btn-outline-danger'"
+                                    th:text="${p.status.name() == 'BANNED'} ? 'Mở lại' : 'Cấm bán'"></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+</div>
+</body>
+</html>

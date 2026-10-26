@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title th:text="'Đơn #' + ${order.code}">Đơn hàng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Chi tiết đơn hàng</h1>
+<div layout:fragment="content">
+    <a th:href="@{/admin/orders}" class="small"><i class="bi bi-arrow-left"></i> Danh sách đơn</a>
+    <div th:replace="~{fragments/order-view :: view(${order}, 'admin')}"></div>
+</div>
+</body>
+</html>

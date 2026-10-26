@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Kênh giao hàng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Thống kê giao hàng</h1>
+<div layout:fragment="content">
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-xl-3"><a th:href="@{/shipper/orders(status='CONFIRMED')}" class="rb-card rb-stat text-dark"><div class="icon" style="background:#e3eefc;color:#2f6fd0"><i class="bi bi-box"></i></div>
+            <div><div class="value" th:text="${summary.waiting}"></div><div class="label">Chờ lấy hàng</div></div></a></div>
+        <div class="col-6 col-xl-3"><a th:href="@{/shipper/orders(status='SHIPPING')}" class="rb-card rb-stat text-dark"><div class="icon" style="background:#fdf3e1;color:#b7862c"><i class="bi bi-truck"></i></div>
+            <div><div class="value" th:text="${summary.pickedUp + summary.shipping}"></div><div class="label">Đang giao</div></div></a></div>
+        <div class="col-6 col-xl-3"><a th:href="@{/shipper/orders(status='DELIVERED')}" class="rb-card rb-stat text-dark"><div class="icon" style="background:#e4f2e6;color:#3d6b3a"><i class="bi bi-house-check"></i></div>
+            <div><div class="value" th:text="${summary.delivered}"></div><div class="label">Đã giao thành công</div></div></a></div>
+        <div class="col-6 col-xl-3"><div class="rb-card rb-stat"><div class="icon bg-primary-soft text-primary"><i class="bi bi-cash"></i></div>
+            <div><div class="value" th:text="${@fmt.money(summary.codCollected)}"></div><div class="label" th:text="'Tiền COD tháng này (' + ${summary.monthDelivered} + ' đơn)'"></div></div></div></div>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-7"><div class="rb-card p-3 h-100"><h2 class="h6 fw-bold">Số đơn giao thành công 30 ngày</h2><div style="height:280px"><canvas id="shipChart"></canvas></div></div></div>
+        <div class="col-lg-5">
+            <div class="rb-card h-100">
+                <h2 class="h6 fw-bold p-3 mb-0">Đơn đang giao</h2>
+                <a th:each="o : ${todo}" th:href="@{/shipper/orders/{id}(id=${o.id})}" class="d-block px-3 py-2 border-top text-dark small">
+                    <div class="d-flex justify-content-between"><strong th:text="'#' + ${o.code}"></strong><span th:text="${@fmt.money(o.total)}"></span></div>
+                    <div class="text-muted text-truncate" th:text="${o.receiverName} + ' · ' + ${o.shippingAddress}"></div>
+                </a>
+                <div class="rb-empty py-4" th:if="${#lists.isEmpty(todo)}"><i class="bi bi-check2-all"></i><p class="small">Không có đơn đang giao</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="scripts">
+    <th:block th:replace="~{fragments/chart :: render('shipChart', ${chart}, 'bar', 'Đơn đã giao', false)}"></th:block>
+</th:block>
+</body>
+</html>

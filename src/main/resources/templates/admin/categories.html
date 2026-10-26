@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Danh mục</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Quản lý danh mục</h1>
+<div layout:fragment="content">
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="rb-card p-3">
+                <h2 class="h6 fw-bold" th:text="${form.id == null} ? 'Thêm danh mục' : 'Sửa danh mục'"></h2>
+                <form th:action="@{/admin/categories/save}" th:object="${form}" method="post" novalidate>
+                    <input type="hidden" th:field="*{id}">
+                    <div class="mb-3">
+                        <label class="form-label small">Tên danh mục</label>
+                        <input class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:errors="*{name}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Icon (Bootstrap Icons)</label>
+                        <input class="form-control" th:field="*{icon}" placeholder="bi-book">
+                        <small class="text-muted">Ví dụ: bi-book, bi-feather, bi-globe2</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Mô tả</label>
+                        <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary">Lưu</button>
+                        <a th:if="${form.id != null}" th:href="@{/admin/categories}" class="btn btn-light border">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="rb-card">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead><tr><th>Icon</th><th>Tên danh mục</th><th>Slug</th><th class="text-center">Số sách</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="c : ${categories}">
+                        <td><i class="bi fs-5 text-primary" th:classappend="${c.icon}"></i></td>
+                        <td class="fw-semibold" th:text="${c.name}"></td>
+                        <td class="text-muted" th:text="${c.slug}"></td>
+                        <td class="text-center" th:text="${service.countProducts(c.id)}"></td>
+                        <td class="text-end text-nowrap">
+                            <a th:href="@{/admin/categories(edit=${c.id})}" class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></a>
+                            <form th:action="@{/admin/categories/{id}/delete(id=${c.id})}" method="post" class="d-inline" data-confirm="Xóa danh mục này?">
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

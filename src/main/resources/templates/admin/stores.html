@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head><title>Cửa hàng</title></head>
+<body>
+<h1 layout:fragment="page-title" class="h5 mb-0 font-serif">Cửa hàng & chiết khấu</h1>
+<div layout:fragment="content">
+    <form class="d-flex gap-2 mb-3 flex-wrap" method="get">
+        <input type="search" name="q" class="form-control form-control-sm" style="width:260px" placeholder="Tên cửa hàng" th:value="${q}">
+        <select name="status" class="form-select form-select-sm" style="width:180px">
+            <option value="">Mọi trạng thái</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${status == s}"></option>
+        </select>
+        <button class="btn btn-sm btn-primary">Lọc</button>
+    </form>
+    <div class="rb-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead><tr><th>Cửa hàng</th><th>Chủ shop</th><th>Ngày đăng ký</th><th>Trạng thái</th><th style="width:200px">Chiết khấu app</th><th class="text-end">Thao tác</th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${page.content}">
+                    <td><a th:href="@{/admin/products(storeId=${s.id})}" class="fw-semibold" th:text="${s.name}"></a><br><small class="text-muted" th:text="${s.address}"></small></td>
+                    <td><div th:text="${s.owner.fullName}"></div><small class="text-muted" th:text="${s.owner.email}"></small></td>
+                    <td th:text="${@fmt.date(s.createdAt)}"></td>
+                    <td><span class="badge" th:classappend="${s.status.name() == 'ACTIVE'} ? 'text-bg-success' : (${s.status.name() == 'PENDING'} ? 'text-bg-warning' : 'text-bg-danger')" th:text="${s.status.label}"></span></td>
+                    <td>
+                        <form th:action="@{/admin/stores/{id}/commission(id=${s.id})}" method="post" class="input-group input-group-sm">
+                            <input type="number" name="rate" class="form-control" min="0" max="50" step="0.5" th:value="${s.commissionRate}">
+                            <span class="input-group-text">%</span>
+                            <button class="btn btn-outline-primary">Lưu</button>
+                        </form>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <form th:if="${s.status.name() != 'ACTIVE'}" th:action="@{/admin/stores/{id}/status(id=${s.id})}" method="post" class="d-inline">
+                            <input type="hidden" name="status" value="ACTIVE">
+                            <button class="btn btn-sm btn-success" th:text="${s.status.name() == 'PENDING'} ? 'Duyệt' : 'Mở khóa'"></button>
+                        </form>
+                        <form th:if="${s.status.name() != 'BLOCKED'}" th:action="@{/admin/stores/{id}/status(id=${s.id})}" method="post" class="d-inline"
+                              data-confirm="Khóa cửa hàng này? Toàn bộ sách của shop sẽ bị ẩn.">
+                            <input type="hidden" name="status" value="BLOCKED">
+                            <button class="btn btn-sm btn-outline-danger" th:text="${s.status.name() == 'PENDING'} ? 'Từ chối' : 'Khóa'"></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:replace="~{fragments/pagination :: pager(${page})}"></div>
+</div>
+</body>
+</html>
