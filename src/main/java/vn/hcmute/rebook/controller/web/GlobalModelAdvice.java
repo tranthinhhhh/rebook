@@ -25,6 +25,9 @@ public class GlobalModelAdvice {
         model.addAttribute("currentUser", user);
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("navCategories", categoryService.findAll());
+        // Chỉ hiện danh sách tài khoản demo khi chạy trên máy (không lộ khi chia sẻ link công khai)
+        String host = request.getServerName();
+        model.addAttribute("showDemoAccounts", "localhost".equals(host) || "127.0.0.1".equals(host));
         if (user != null) {
             model.addAttribute("cartCount", cartService.count(user.getId()));
             model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));

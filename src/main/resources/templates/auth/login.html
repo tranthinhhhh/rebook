@@ -27,7 +27,7 @@
                 </form>
                 <p class="text-center mt-4 mb-0">Chưa có tài khoản? <a th:href="@{/auth/register}" class="fw-semibold">Đăng ký ngay</a></p>
             </div>
-            <details class="rb-card mt-3 p-3 small">
+            <details class="rb-card mt-3 p-3 small" th:if="${showDemoAccounts}">
                 <summary class="fw-semibold cursor-pointer">Tài khoản demo (mật khẩu: 123456a)</summary>
                 <table class="table table-sm mt-2 mb-0">
                     <tr><td>Admin</td><td>admin@rebook.vn</td></tr>
