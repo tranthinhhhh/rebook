@@ -1,6 +1,8 @@
 # ReBook – Website quản lý chuỗi cửa hàng sách cũ
 
 Đồ án cuối kỳ môn **Lập trình Web (WEPR330479)** – HCMUTE
+
+**GitHub:** https://github.com/tranthinhhhh/rebook
 **Đề tài 14:** Xây dựng website quản lý chuỗi cửa hàng sách cũ bằng Spring Boot + Thymeleaf + Bootstrap + JPA + MySQL + JWT + WebSocket + Cloudinary.
 
 | Thành viên | MSSV | Phụ trách |
@@ -61,6 +63,10 @@ Nếu dùng tài khoản MySQL khác, sửa `spring.datasource.*` trong `src/mai
 | `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET` | Mã website VNPay sandbox (đăng ký tại sandbox.vnpayment.vn/devreg) | Ẩn lựa chọn VNPay, chỉ dùng COD |
 
 ### 4. Chạy
+```bash
+git clone https://github.com/tranthinhhhh/rebook.git
+cd rebook
+```
 Không cần cài Maven, dùng Maven Wrapper có sẵn trong project:
 ```bash
 ./mvnw spring-boot:run        # macOS / Linux
