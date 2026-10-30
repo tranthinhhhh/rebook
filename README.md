@@ -10,7 +10,7 @@
 | Trần Tiến Thịnh | 22110236 | Guest, User, Shipper, chức năng chung (đăng ký/quên mật khẩu OTP, đăng nhập JWT) |
 | Phan Thanh Thiện | 22110234 | Vendor, Manager, Admin, WebSocket chat & thông báo |
 
-## Công nghệ
+## Công nghệ sử dụng
 - Java 21, Spring Boot 3.3.5, Maven
 - Thymeleaf + Thymeleaf Layout Dialect + Spring Security extras, Bootstrap 5.3, Bootstrap Icons, Chart.js
 - Spring Data JPA (Hibernate) + MySQL 8
